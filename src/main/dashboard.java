@@ -4,6 +4,10 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,6 +21,14 @@ import javax.swing.border.Border;
 
 public class dashboard {
   JFrame dh = new JFrame();
+  Color inUse = Color.decode("#366f9a");
+  Color notUsed = Color.decode("#4dbbdc");
+  
+  JLabel Overview = new JLabel("Overview", SwingConstants.CENTER);
+  JLabel Members = new JLabel("Members", SwingConstants.CENTER);
+  JLabel User_Logs = new JLabel("User Logs", SwingConstants.CENTER);
+  JLabel Equipments = new JLabel("Equipments", SwingConstants.CENTER);
+  JLabel panelInUse = Overview;
 
   public dashboard() {
     SwingUtilities.invokeLater(() -> {
@@ -38,7 +50,7 @@ public class dashboard {
     dh.add(p1);
 
     p2.setBounds(0, 0, 200, 600);
-    p2.setBackground(Color.decode("#4dbbdc"));
+    p2.setBackground(Color.decode("#4daddc"));
     p2.setLayout(null);
     dh.add(p2);
 
@@ -84,24 +96,70 @@ public class dashboard {
     logout.setIcon(logoutIcon);
     p2.add(logout);
     
-    
-    labelBtn("Members", p2, 200);
-    labelBtn("User Logs", p2, 290);
-    labelBtn("Equipments", p2, 380);
+    JLabel title = new JLabel("Gym Management System");
+    title.setBounds(20, -15, 500, 100);
+    title.setForeground(Color.white);
+    title.setFont(new java.awt.Font("Inter Medium", Font.PLAIN, 20)); // NOI18N
+    p1.add(title);
 
+    labelBtn(p2, 200, Overview);
+    labelBtn(p2, 270, Members);
+    labelBtn(p2, 340, User_Logs);
+    labelBtn(p2, 410, Equipments); 
+   
+    Overview.setBackground(inUse);
+    Overview.setBorder(BorderFactory.createBevelBorder(1)); 
+    Overview.setForeground(Color.WHITE);
     dh.setVisible(true); // Set frame visible after all components are added
   }
 
-  public void labelBtn(String Label, JPanel panel, int height) {
+  public void labelBtn(JPanel panel, int height, JLabel labelName) {
 
-    JLabel l1 = new JLabel(Label, SwingConstants.CENTER);
-    l1.setFont(new Font("Inter Medium", Font.BOLD, 14));
-    l1.setBounds(10, height, 180, 60);
-    l1.setBackground(Color.decode("#4daddc"));
-    l1.setOpaque(true);
-    l1.setFocusable(true);
-    l1.setCursor(new Cursor(Cursor.HAND_CURSOR));
-    panel.add(l1);
+    labelName.setName(labelName.getText());
+    labelName.setFont(new Font("Inter Medium", Font.BOLD, 14));
+    labelName.setBounds(20, height, 160, 40);
+    labelName.setBackground(Color.decode("#4dbbdc"));
+    labelName.setOpaque(true);
+    labelName.setFocusable(true);
+    labelName.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    panel.add(labelName);
+    JLabel[] panels = {Overview, Members, User_Logs, Equipments};
+    Border bevel = BorderFactory.createBevelBorder(1);
+   
+    
+    
+    labelName.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+    
+                if(e.getSource() instanceof JLabel )
+                     
+                        for(int i = 0; i<panels.length; i++){
+                            
+                            if(e.getComponent() != panelInUse){
+                                panelInUse = (JLabel) e.getComponent();
+                                panelInUse.setBackground(inUse);
+                                panelInUse.setForeground(Color.WHITE);
+                                panelInUse.setBorder(bevel);
+                                 for(int k = 0; i<panels.length; i++){
+                                     if (panels[i] == panelInUse){
+                                         continue;
+                                     }else{
+                                         panels[i].setBackground(notUsed);
+                                         panels[i].setForeground(Color.BLACK);
+                                         panels[i].setBorder(null);
+                                     }
+                                 }
+                            }else{
+                                break;
+                            }
+                  
+                        }
+                     
+                     
+
+            }
+     });
   }
 
 }
