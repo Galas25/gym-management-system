@@ -10,19 +10,29 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-public class GYMSYSTEM {
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+public class gym {
+  
+  
   String username = "admin";
   String password = "test123";
 
   public static void main(String[] args) {
-    GYMSYSTEM g1 = new GYMSYSTEM();
+    GymManagement gym = new GymManagement(3);
+    gym.addMember(new Members("Alex", LocalDate.now(), LocalDate.now().plusMonths(1)));
+    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1)));
+    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1)));
+    gym.printAllMembers();
+    
+    gym.checkInMember(10020241, LocalDateTime.now());
+ 
+    
+    
     login();
-    //       g1.login();
-    //       g1.signUp();
-//    dashboard dash = new dashboard();
-
+    
   }
-
+  
   public static void login() {
     JFrame frame = new JFrame();
     JPanel panel = new JPanel();
@@ -69,6 +79,7 @@ public class GYMSYSTEM {
     login.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        frame.dispose();
         new dashboard();
 
       }
@@ -80,7 +91,6 @@ public class GYMSYSTEM {
     frame.setLocationRelativeTo(null);
     frame.toFront();
   }
-
   public static void signUp() {
     JFrame frame = new JFrame();
     JLabel label = new JLabel();
@@ -135,5 +145,6 @@ public class GYMSYSTEM {
     frame.setVisible(true);
 
   }
-
+  
+   
 }

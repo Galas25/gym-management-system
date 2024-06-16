@@ -12,12 +12,13 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
-public class dashboard {
+public class dashboard extends gym {
     JFrame dh = new JFrame();
     Color inUse = Color.decode("#366f9a");
     Color notUsed = Color.decode("#4dbbdc");
@@ -82,6 +83,9 @@ public class dashboard {
         nameLbl.setFont(new java.awt.Font("Inter SemiBold", Font.BOLD, 20));
         p2.add(nameLbl);
 
+        
+        // LOG OUT BUTTON
+        
         JLabel logout = new JLabel("LOG-OUT", JLabel.CENTER);
         logout.setForeground(Color.white);
         logout.setBounds(60, 480, 90, 30);
@@ -90,6 +94,18 @@ public class dashboard {
         logout.setBackground(Color.decode("#366f9a"));
         logout.setOpaque(true);
         logout.setBorder(line);
+        logout.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?", "LOG OUT", JOptionPane.YES_NO_OPTION);
+                if (choice == 0){
+                    dh.dispose();
+                    login();
+                }
+            }
+        });
+        
+        
         ImageIcon logoutIcon = new ImageIcon(
                 new ImageIcon(dashboard.class.getResource("exit.png"))
                         .getImage()
@@ -185,8 +201,5 @@ public class dashboard {
             add(new JLabel("Equipments Content"));
         }
     }
-
-    public static void main(String[] args) {
-        new dashboard();
-    }
+  
 }
