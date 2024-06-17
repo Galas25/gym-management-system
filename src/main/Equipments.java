@@ -8,15 +8,7 @@ package main;
  *
  * @author Server
  */
-public class idCounter {
-    static int count = 0;
-
-    public static int getCount() {
-        return count;
-    }
-
-    public static void setCount(int count) {
-        idCounter.count = count;
-    }
-
+public class Equipments {
+    
+    
 }

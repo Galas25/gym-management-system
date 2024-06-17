@@ -65,10 +65,60 @@ public class GymManagement {
     }
 
     // Method to print all members
-    public void printAllMembers() {
+    public int printAllMembers() {
+        int memcount = 0;
         for (int i = 0; i < count; i++) {
             System.out.println("Member ID: " + members[i].getMembershipId() + ", Name: " + members[i].getName());
+            memcount += 1;
+            
         }
+        return memcount;
+    
     }
+    public int checkinToday(){
+          int todayCount = 0;
+        LocalDate today = LocalDate.now();
+        
+        for (int i = 0; i < count; i++) {
+            // Assuming members[i] has a check-in time as a LocalDateTime field
+            LocalDateTime checkinDateTime = members[i].getCheckInTime();
+            
+            if (checkinDateTime != null) {
+                LocalDate checkinDate = checkinDateTime.toLocalDate();
+                
+                if (checkinDate.equals(today)) {
+                    todayCount++;
+                }
+            }
+        }
+        
+        return todayCount;
+    }
+    
+    public int activeMembers(){
+        int activeCount = 0;
+        for (int i = 0; i < count; i++) {   
+              if(members[i].getStartDate().isAfter(LocalDate.now().minusMonths(1))){    
+                  activeCount += 1; 
+              }   
+        }
+         return activeCount;
+    }
+    public Members[] getMembers() {
+        return members;
+    }
+
+    public void setMembers(Members[] members) {
+        this.members = members;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+   
 }
 

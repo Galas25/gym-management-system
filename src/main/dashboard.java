@@ -174,32 +174,170 @@ public class dashboard extends gym {
     }
 
     // Example panel classes
-    class OverviewPanel extends JPanel {
+    public void addBorder(JPanel panel,int margin,String message, String num){
+         JPanel p2 = new JPanel();
+         p2.setLayout(null);
+         p2.setBounds(margin, 240, 200, 230);
+         p2.setBackground(Color.WHITE);
+         JLabel title = new JLabel(message);
+         title.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+         title.setBounds(10, -30, 200, 100);
+         JLabel number = new JLabel(num);
+         number.setFont(new Font("Open Sans", Font.BOLD, 80));
+         number.setBounds(0,0,200,230);
+         number.setHorizontalAlignment(JLabel.CENTER);
+         number.setVerticalAlignment(JLabel.CENTER);
+         p2.add(number);
+         p2.add(title);
+         panel.add(p2);
+    }
+    class OverviewPanel extends JPanel{
         public OverviewPanel() {
-            setBackground(Color.decode("#E7E7E7"));
-            add(new JLabel("Overview Content"));
+            setBackground(Color.decode("#ebebeb"));
+            setLayout(null);
+            JPanel p1 = new JPanel();
+            p1.setBounds(20, 20, 500, 200);
+            p1.setBackground(Color.WHITE);
+            p1.setLayout(null);
+            JLabel welcome = new JLabel("Welcome,");
+            welcome.setBounds(20, -20, 400, 100);
+            welcome.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+            p1.add(welcome);
+            
+            JLabel name = new JLabel("User");
+            name.setBounds(20, 20, 400, 100);
+            name.setFont(new Font("Segoe UI", Font.BOLD, 62));
+            p1.add(name);
+            
+            JLabel admin = new JLabel("Admin");
+            admin.setBounds(20, 65, 400, 100);
+            admin.setFont(new Font("Segoe UI", Font.BOLD, 20));
+            p1.add(admin);
+
+           JLabel cogwheel = new JLabel();
+           cogwheel.setBounds(250, 0, 307, 307);
+
+           // Load ImageIcon
+           ImageIcon scaledIcon = new ImageIcon(
+                   new ImageIcon(dashboard.class.getResource("cogs.png"))
+                           .getImage()
+                           .getScaledInstance(307, 307, Image.SCALE_SMOOTH)
+           );
+           cogwheel.setIcon(scaledIcon);
+           p1.add(cogwheel);
+           
+           JLabel logout = new JLabel("Logout", JLabel.CENTER);
+           logout.setForeground(Color.white);
+           logout.setBounds(20, 170, 70, 15);
+           Border line = BorderFactory.createLineBorder(Color.black);
+           logout.setCursor(new Cursor(Cursor.HAND_CURSOR));
+           logout.setBackground(Color.decode("#366f9a"));
+           logout.setOpaque(true);
+           logout.setBorder(line);
+           logout.addMouseListener(new MouseAdapter() {
+             @Override
+             public void mouseClicked(MouseEvent e) {
+                 int choice = JOptionPane.showConfirmDialog(null, "Are you sure you want to log out?", "LOG OUT", JOptionPane.YES_NO_OPTION);
+                 if (choice == 0){
+                     dh.dispose();
+                     login();
+                 }
+             }
+         });
+        
+        
+        ImageIcon logoutIcon = new ImageIcon(
+                new ImageIcon(dashboard.class.getResource("exit.png"))
+                        .getImage()
+                        .getScaledInstance(15, 15, Image.SCALE_SMOOTH)
+        );
+        logout.setIcon(logoutIcon);
+        p1.add(logout);
+           
+           
+            JPanel p2 = new JPanel();
+            p2.setLayout(null);
+            p2.setBounds(540,20,225,200);
+            p2.setBackground(Color.white);
+            JLabel title = new JLabel("Equipments");
+            title.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+            title.setBounds(10, -30, 200, 100);
+            JLabel number = new JLabel("323");
+            number.setFont(new Font("Open Sans", Font.BOLD, 80));
+            number.setBounds(0,0,225,200);
+            number.setHorizontalAlignment(JLabel.CENTER);
+            number.setVerticalAlignment(JLabel.CENTER);
+            p2.add(number);
+            p2.add(title);
+            add(p2);
+
+
+            add(p1);
+            addBorder(this,20,"Total Members", String.valueOf(gym.getCount()));
+            addBorder(this,240,"Active Members", String.valueOf(gym.activeMembers()));
+            addBorder(this,460,"Check-Ins Today",String.valueOf(gym.checkinToday()));
         }
     }
 
     class MembersPanel extends JPanel {
         public MembersPanel() {
-            setBackground(Color.decode("#E7E7E7"));
+            setBackground(Color.decode("#ebebeb"));
             add(new JLabel("Members Content"));
+            setLayout(null);
+            JPanel p1 = new JPanel();
+            p1.setBounds(20, 20, 745, 200);
+            p1.setBackground(Color.WHITE);
+            JPanel p1_2 = new JPanel();
+            p1_2.setBackground(Color.decode("#4daddc"));
+            int thickness = 5; // Adjust the thickness as desired
+            p1_2.setBorder(BorderFactory.createEmptyBorder(thickness, 0, thickness, 0));
+
+            p1.setLayout(new BorderLayout());
+            
+            p1.add(p1_2,BorderLayout.NORTH);
+            add(p1);
         }
     }
 
     class UserLogsPanel extends JPanel {
         public UserLogsPanel() {
-            setBackground(Color.decode("#E7E7E7"));
+            setBackground(Color.decode("#ebebeb"));
             add(new JLabel("User Logs Content"));
+            JPanel p1 = new JPanel();
+            setLayout(null);
+            p1.setBounds(20, 20, 745, 200);
+            p1.setBackground(Color.WHITE);
+            JPanel p1_2 = new JPanel();
+            p1_2.setBackground(Color.decode("#4daddc"));
+            int thickness = 5; // Adjust the thickness as desired
+            p1_2.setBorder(BorderFactory.createEmptyBorder(thickness, 0, thickness, 0));
+
+            p1.setLayout(new BorderLayout());
+            
+            p1.add(p1_2,BorderLayout.NORTH);
+            add(p1);
         }
     }
 
     class EquipmentsPanel extends JPanel {
         public EquipmentsPanel() {
-            setBackground(Color.decode("#E7E7E7"));
+            setBackground(Color.decode("#ebebeb"));
             add(new JLabel("Equipments Content"));
+            JPanel p1 = new JPanel();
+            setLayout(null);
+            p1.setBounds(20, 20, 745, 200);
+            p1.setBackground(Color.WHITE);
+            JPanel p1_2 = new JPanel();
+            p1_2.setBackground(Color.decode("#4daddc"));
+            int thickness = 5; // Adjust the thickness as desired
+            p1_2.setBorder(BorderFactory.createEmptyBorder(thickness, 0, thickness, 0));
+
+            p1.setLayout(new BorderLayout());
+            
+            p1.add(p1_2,BorderLayout.NORTH);
+            add(p1);
         }
+    
     }
   
 }

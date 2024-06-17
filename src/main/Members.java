@@ -22,8 +22,8 @@ public class Members {
 
     public int memId(){
         
-        int tempId = idCounter.getCount() + 1;
-        idCounter.setCount(idCounter.count + 1);
+        int tempId = counter.getCount() + 1;
+        counter.setCount(counter.count + 1);
         return Integer.parseInt("1002024" + tempId);
     }
 
