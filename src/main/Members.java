@@ -24,7 +24,7 @@ public class Members {
         
         int tempId = counter.getCount() + 1;
         counter.setCount(counter.count + 1);
-        return Integer.parseInt("1002024" + tempId);
+        return tempId;
     }
 
     public int getId_count() {

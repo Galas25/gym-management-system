@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class gym {
   String username = "admin";
   String password = "test123";
- static GymManagement gym = new GymManagement(5);
+  static GymManagement gym = new GymManagement(5);
   public static void main(String[] args) {
     
     gym.addMember(new Members("Alex", LocalDate.now().minusMonths(1), LocalDate.now()));
@@ -25,9 +25,10 @@ public class gym {
     gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1)));
     counter.setCount(gym.printAllMembers());
     
-    gym.checkInMember(10020241, LocalDateTime.now());
-    gym.checkInMember(10020242, LocalDateTime.now());
-    gym.checkInMember(10020243, LocalDateTime.now());
+
+    gym.checkInMember(1, LocalDateTime.now());
+    gym.checkInMember(2, LocalDateTime.now());
+    gym.checkInMember(3, LocalDateTime.now());
  
     
     

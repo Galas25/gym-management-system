@@ -21,15 +21,24 @@ public class GymManagement {
         members = new Members[size];
         count = 0; 
     }
+     private void resizeMembersArray() {
+        int newSize = members.length * 2; // Double the size of the current array
+        Members[] newArray = new Members[newSize];
+        // Copy existing members to the new array
+        System.arraycopy(members, 0, newArray, 0, members.length);
+        members = newArray;
+    }
     
     public void addMember(Members member){
-        if (count <members.length){
-            members[count] = member;
-            count++;
-        }else{
-            System.out.println("full");
-        } 
+        if (count >= members.length){
+            resizeMembersArray();
+        }
+        
+        members[count] = member;
+        count++;
     }
+
+ 
     
    public Members findMemberByID(int membershipID) {
         for (int i = 0; i < count; i++) {

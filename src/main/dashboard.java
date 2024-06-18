@@ -3,20 +3,40 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 public class dashboard extends gym {
     JFrame dh = new JFrame();
@@ -278,26 +298,191 @@ public class dashboard extends gym {
             addBorder(this,460,"Check-Ins Today",String.valueOf(gym.checkinToday()));
         }
     }
+    static class PaddedCellRenderer extends DefaultTableCellRenderer {
+        private int topPadding;
+        private int bottomPadding;
 
-    class MembersPanel extends JPanel {
-        public MembersPanel() {
-            setBackground(Color.decode("#ebebeb"));
-            add(new JLabel("Members Content"));
-            setLayout(null);
-            JPanel p1 = new JPanel();
-            p1.setBounds(20, 20, 745, 200);
-            p1.setBackground(Color.WHITE);
-            JPanel p1_2 = new JPanel();
-            p1_2.setBackground(Color.decode("#4daddc"));
-            int thickness = 5; // Adjust the thickness as desired
-            p1_2.setBorder(BorderFactory.createEmptyBorder(thickness, 0, thickness, 0));
+        public PaddedCellRenderer(int topPadding, int bottomPadding) {
+            this.topPadding = topPadding;
+            this.bottomPadding = bottomPadding;
+            setOpaque(true); // Must do this for background to show up.
+        }
 
-            p1.setLayout(new BorderLayout());
-            
-            p1.add(p1_2,BorderLayout.NORTH);
-            add(p1);
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+            // Set padding for top and bottom
+            ((JComponent) c).setBorder(BorderFactory.createEmptyBorder(topPadding, 10, bottomPadding, 10));
+
+            return c;
         }
     }
+
+    class MembersPanel extends JPanel {
+        DefaultTableModel dtm = new DefaultTableModel();
+        
+        private void updateTableData() {
+        dtm.setRowCount(0); // Clear existing rows
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+        for (Members member : gym.getMembers()) {
+            String formattedStartDate = member.getStartDate().format(dateTimeFormatter);
+            String formattedExpDate = member.getExpDate().format(dateTimeFormatter);
+            dtm.addRow(new Object[]{member.getMembershipId(), member.getName(), formattedStartDate, formattedExpDate});
+        }
+        }
+        
+        public MembersPanel() {
+            setBackground(Color.decode("#ebebeb"));
+        setLayout(null);
+
+        // Create the main panel to hold the table and its header
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBounds(20, 20, 745, 250);
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setLayout(new BorderLayout());
+        add(mainPanel);
+
+        // Create the table model and the table
+        
+        dtm.addColumn("MEMBERSHIPID");
+        dtm.addColumn("NAME");
+        dtm.addColumn("STARTDATE");
+        dtm.addColumn("EXPIREDATE");
+
+        // Example data
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+        // Replace this with your actual data retrieval logic
+        for (Members members : gym.getMembers()) {
+            String formattedStartDate = members.getStartDate().format(dateTimeFormatter);
+            String formattedExpDate = members.getExpDate().format(dateTimeFormatter);
+            dtm.addRow(new Object[]{members.getMembershipId(), members.getName(), formattedStartDate, formattedExpDate});
+        }
+
+        JTable table = new JTable(dtm);
+
+        // Set the default cell renderer with padding
+        TableCellRenderer cellRenderer = new PaddedCellRenderer(10, 10);
+        table.setDefaultRenderer(Object.class, cellRenderer);
+
+        // Customize the table header
+        JTableHeader header = table.getTableHeader();
+        header.setReorderingAllowed(false); // Disable column dragging
+        Font headerFont = new Font("Segoe UI", Font.BOLD, 16);
+        Color headerFontColor = Color.WHITE;
+        header.setFont(headerFont);
+        header.setForeground(headerFontColor);
+        header.setBackground(Color.decode("#366f9a"));
+
+        // Disable column resizing
+        TableColumnModel columnModel = header.getColumnModel();
+        for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++) {
+            TableColumn column = columnModel.getColumn(columnIndex);
+            column.setResizable(false);
+        }
+
+        // Add the table to a scroll pane
+        JScrollPane scrollPane = new JScrollPane(table);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        JButton create, read, update, clear;
+        
+        
+        
+        JPanel infoPanel = new JPanel();
+        infoPanel.setBounds(20, 290, 470, 180);
+        infoPanel.setLayout(null);
+        infoPanel.setBackground(Color.white);
+        TitledBorder titledBorder = BorderFactory.createTitledBorder("Information");
+        titledBorder.setTitleJustification(TitledBorder.CENTER);
+        infoPanel.setBorder(titledBorder);
+        add(infoPanel);
+        
+        JLabel id = new JLabel("MembershipId");
+        id.setBounds(20,20,150,30);
+        infoPanel.add(id);
+        
+        JTextField idField = new JTextField();
+        idField.setEditable(false);
+        idField.setFocusable(false);
+        idField.setForeground(Color.BLACK);
+        idField.setBounds(20, 50, 150, 30);
+        infoPanel.add(idField);
+        
+        JLabel name = new JLabel("Name");
+        name.setBounds(20,80,150,30);
+        infoPanel.add(name);
+        
+        JTextField nameField = new JTextField();
+        nameField.setBounds(20, 110, 150, 30);
+        infoPanel.add(nameField);
+        
+        JLabel startDate = new JLabel("Start Date");
+        startDate.setBounds(190,20,150,30);
+        infoPanel.add(startDate);
+        
+        JTextField startDateField = new JTextField();
+        startDateField.setBounds(190, 50, 150, 30);
+        infoPanel.add(startDateField);
+        
+        JLabel ExpDate = new JLabel("Expire-Date");
+        ExpDate.setBounds(190,80,150,30);
+        infoPanel.add(ExpDate);
+        
+        JTextField ExpDateField = new JTextField();
+        ExpDateField.setBounds(190, 110, 150, 30);
+        infoPanel.add(ExpDateField);
+        
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int idfromTable = (int) table.getValueAt(row, 0);
+                Members member = gym.findMemberByID(idfromTable);
+                idField.setText(String.valueOf(member.getMembershipId()));
+                nameField.setText(member.getName());
+                startDateField.setText(String.valueOf(member.getStartDate()));
+                ExpDateField.setText(String.valueOf(member.getExpDate()));
+                
+            }
+        });
+        create = new JButton("Create");
+        create.setBounds(510,320,100,50);
+        create.setBackground(Color.green);
+        create.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    gym.addMember(new Members(nameField.getText(),LocalDate.now(),LocalDate.now().plusMonths(1)));
+                    updateTableData();
+                }
+        
+        
+        });
+        add(create);
+        
+        
+        
+        read = new JButton("Update");
+        read.setBounds(630,320,100,50);
+        read.setBackground(Color.decode("#ff8b26"));
+        add(read);
+        
+        update = new JButton("Delete");
+        update.setBounds(510,390,100,50);
+        update.setBackground(Color.red);
+        add(update);
+        
+        clear = new JButton("Clear");
+        clear.setBounds(630,390,100,50);
+        clear.setBackground(Color.decode("#94a0ff"));
+        add(clear);
+        
+    }
+        
+    }
+    
 
     class UserLogsPanel extends JPanel {
         public UserLogsPanel() {
@@ -341,3 +526,4 @@ public class dashboard extends gym {
     }
   
 }
+
