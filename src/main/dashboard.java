@@ -328,9 +328,11 @@ public class dashboard extends gym {
         dtm.setRowCount(0); // Clear existing rows
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
         for (Members member : gym.getMembers()) {
+           if (member != null) {
             String formattedStartDate = member.getStartDate().format(dateTimeFormatter);
             String formattedExpDate = member.getExpDate().format(dateTimeFormatter);
-            dtm.addRow(new Object[]{member.getMembershipId(), member.getName(), formattedStartDate, formattedExpDate});
+            dtm.addRow(new Object[]{member.getMembershipId(), member.getName(), formattedStartDate, formattedExpDate, member.username, member.password});
+        }
         }
         }
         
@@ -347,10 +349,12 @@ public class dashboard extends gym {
 
         // Create the table model and the table
         
-        dtm.addColumn("MEMBERSHIPID");
+        dtm.addColumn("ID");
         dtm.addColumn("NAME");
         dtm.addColumn("STARTDATE");
         dtm.addColumn("EXPIREDATE");
+        dtm.addColumn("USERNAME");
+        dtm.addColumn("PASSWORD");
 
         // Example data
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
@@ -358,7 +362,7 @@ public class dashboard extends gym {
         for (Members members : gym.getMembers()) {
             String formattedStartDate = members.getStartDate().format(dateTimeFormatter);
             String formattedExpDate = members.getExpDate().format(dateTimeFormatter);
-            dtm.addRow(new Object[]{members.getMembershipId(), members.getName(), formattedStartDate, formattedExpDate});
+            dtm.addRow(new Object[]{members.getMembershipId(), members.getName(), formattedStartDate, formattedExpDate, members.getUsername(), members.getPassword()});
         }
 
         JTable table = new JTable(dtm);
@@ -392,7 +396,7 @@ public class dashboard extends gym {
         
         
         JPanel infoPanel = new JPanel();
-        infoPanel.setBounds(20, 290, 470, 180);
+        infoPanel.setBounds(20, 290, 625, 180);
         infoPanel.setLayout(null);
         infoPanel.setBackground(Color.white);
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Information");
@@ -419,6 +423,30 @@ public class dashboard extends gym {
         nameField.setBounds(20, 110, 150, 30);
         infoPanel.add(nameField);
         
+        JLabel error = new JLabel("username or password is incorrect.");
+        error.setBounds(20,150,585,20);
+        error.setForeground(Color.decode("#721c24"));
+        error.setBackground(Color.decode("#f8d7da"));
+        error.setOpaque(true);
+        error.setHorizontalAlignment(JLabel.CENTER);
+        error.setVerticalTextPosition(JLabel.CENTER);
+        error.setBorder(BorderFactory.createLineBorder(Color.decode("#f5c6cb"), 1));
+        error.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        error.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        error.setVisible(false);
+        
+        error.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    error.setVisible(false);
+                }
+        
+        
+        });
+        
+        
+        infoPanel.add(error);
+        
         JLabel startDate = new JLabel("Start Date");
         startDate.setBounds(190,20,150,30);
         infoPanel.add(startDate);
@@ -435,6 +463,22 @@ public class dashboard extends gym {
         ExpDateField.setBounds(190, 110, 150, 30);
         infoPanel.add(ExpDateField);
         
+        JLabel username = new JLabel("Username");
+        username.setBounds(360,20,150,30);
+        infoPanel.add(username);
+        
+        JTextField usernameField = new JTextField();
+        usernameField.setBounds(360, 50, 150, 30);
+        infoPanel.add(usernameField);
+        
+        JLabel password = new JLabel("Password");
+        password.setBounds(360,80,150,30);
+        infoPanel.add(password);
+        
+        JTextField passwordField = new JTextField();
+        passwordField.setBounds(360, 110, 150, 30);
+        infoPanel.add(passwordField);
+        
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -445,41 +489,61 @@ public class dashboard extends gym {
                 nameField.setText(member.getName());
                 startDateField.setText(String.valueOf(member.getStartDate()));
                 ExpDateField.setText(String.valueOf(member.getExpDate()));
+                usernameField.setText(member.getUsername());
+                passwordField.setText(member.getPassword());
                 
             }
         });
         create = new JButton("Create");
-        create.setBounds(510,320,100,50);
+        create.setBounds(665,285,100,40);
         create.setBackground(Color.green);
         create.addActionListener(new ActionListener(){
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    gym.addMember(new Members(nameField.getText(),LocalDate.now(),LocalDate.now().plusMonths(1)));
-                    updateTableData();
-                }
-        
-        
+                    
+                    String name= nameField.getText();
+//                    LocalDate start = startDateField.getText();
+                    LocalDate exp = LocalDate.now().plusDays(1);
+                    String username = usernameField.getText();
+                    String password = passwordField.getText();
+                    
+                    if(isnotEmpty(nameField)&& isnotEmpty(startDateField) && isnotEmpty(ExpDateField) && isnotEmpty(usernameField) && isnotEmpty(passwordField)){
+                        
+                    }
+                    
+                }  
         });
         add(create);
         
-        
-        
+    
         read = new JButton("Update");
-        read.setBounds(630,320,100,50);
+        read.setBounds(665,335,100,40);
         read.setBackground(Color.decode("#ff8b26"));
         add(read);
         
         update = new JButton("Delete");
-        update.setBounds(510,390,100,50);
+        update.setBounds(665,385,100,40);
         update.setBackground(Color.red);
         add(update);
         
         clear = new JButton("Clear");
-        clear.setBounds(630,390,100,50);
+        clear.setBounds(665,435,100,40);
         clear.setBackground(Color.decode("#94a0ff"));
         add(clear);
         
     }
+        
+        public boolean isnotEmpty(JTextField field){
+            
+            if(field.getText().equals("") || field.getText() == null){
+               field.setBorder(BorderFactory.createLineBorder(Color.red, 1));
+               return false;
+            }
+            field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+            return true;
+        }
+        
+        
         
     }
     

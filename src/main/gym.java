@@ -18,11 +18,11 @@ public class gym {
   static GymManagement gym = new GymManagement(5);
   public static void main(String[] args) {
     
-    gym.addMember(new Members("Alex", LocalDate.now().minusMonths(1), LocalDate.now()));
-    gym.addMember(new Members("esd", LocalDate.now().minusMonths(2), LocalDate.now().plusMonths(1)));
-    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1)));
-    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1)));
-    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1)));
+    gym.addMember(new Members("Alex", LocalDate.now().minusMonths(1), LocalDate.now(),"Alex","123"));
+    gym.addMember(new Members("esd", LocalDate.now().minusMonths(2), LocalDate.now().plusMonths(1),"Alex","123"));
+    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1),"Alex","123"));
+    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1),"Alex","123"));
+    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1),"Alex","123"));
     counter.setCount(gym.printAllMembers());
     
 
