@@ -37,6 +37,35 @@ public class GymManagement {
         members[count] = member;
         count++;
     }
+    
+    public void removeMember(int id) {
+    int index = -1;
+    
+    // Find the index of the member with the given ID
+    for (int i = 0; i < count; i++) {
+        if (members[i].getMembershipId() == id) {
+            index = i;
+            break;
+        }
+    }
+    
+    if (index != -1) { // Member found
+        // Shift elements to the left to fill the gap
+        for (int i = index; i < count - 1; i++) {
+            members[i] = members[i + 1];
+        }
+        
+        // Nullify the last element (optional)
+        members[count - 1] = null;
+        
+        // Decrement the count of members
+        count--;
+        
+        System.out.println("Member with ID " + id + " has been removed.");
+    } else {
+        System.out.println("Member not found.");
+    }
+}
 
  
     

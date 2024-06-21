@@ -13,6 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -323,7 +324,7 @@ public class dashboard extends gym {
 
     class MembersPanel extends JPanel {
         DefaultTableModel dtm = new DefaultTableModel();
-        
+
         private void updateTableData() {
         dtm.setRowCount(0); // Clear existing rows
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
@@ -360,9 +361,13 @@ public class dashboard extends gym {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
         // Replace this with your actual data retrieval logic
         for (Members members : gym.getMembers()) {
-            String formattedStartDate = members.getStartDate().format(dateTimeFormatter);
-            String formattedExpDate = members.getExpDate().format(dateTimeFormatter);
-            dtm.addRow(new Object[]{members.getMembershipId(), members.getName(), formattedStartDate, formattedExpDate, members.getUsername(), members.getPassword()});
+            
+            if (members != null){
+                String formattedStartDate = members.getStartDate().format(dateTimeFormatter);
+                String formattedExpDate = members.getExpDate().format(dateTimeFormatter);
+                dtm.addRow(new Object[]{members.getMembershipId(), members.getName(), formattedStartDate, formattedExpDate, members.getUsername(), members.getPassword()});
+            }
+            
         }
 
         JTable table = new JTable(dtm);
@@ -391,7 +396,7 @@ public class dashboard extends gym {
         JScrollPane scrollPane = new JScrollPane(table);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         
-        JButton create, read, update, clear;
+        JButton create, update, clear, delete;
         
         
         
@@ -435,19 +440,13 @@ public class dashboard extends gym {
         error.setCursor(new Cursor(Cursor.HAND_CURSOR));
         error.setVisible(false);
         
-        error.addMouseListener(new MouseAdapter(){
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    error.setVisible(false);
-                }
         
-        
-        });
         
         
         infoPanel.add(error);
         
         JLabel startDate = new JLabel("Start Date");
+        startDate.setToolTipText("Format [Year/Month/Day] (2024-06-21)");
         startDate.setBounds(190,20,150,30);
         infoPanel.add(startDate);
         
@@ -494,6 +493,20 @@ public class dashboard extends gym {
                 
             }
         });
+        
+        error.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    error.setVisible(false);
+                    nameField.setBorder(BorderFactory.createLineBorder(Color.black,1));
+                    startDateField.setBorder(BorderFactory.createLineBorder(Color.black,1));
+                    ExpDateField.setBorder(BorderFactory.createLineBorder(Color.black,1));
+                    usernameField.setBorder(BorderFactory.createLineBorder(Color.black,1));
+                    passwordField.setBorder(BorderFactory.createLineBorder(Color.black,1));
+                }
+        
+        
+        });
         create = new JButton("Create");
         create.setBounds(665,285,100,40);
         create.setBackground(Color.green);
@@ -502,13 +515,37 @@ public class dashboard extends gym {
                 public void actionPerformed(ActionEvent e) {
                     
                     String name= nameField.getText();
-//                    LocalDate start = startDateField.getText();
-                    LocalDate exp = LocalDate.now().plusDays(1);
+                    String start = String.valueOf(startDateField.getText());
+                    String exp =  String.valueOf(ExpDateField.getText());
                     String username = usernameField.getText();
                     String password = passwordField.getText();
                     
-                    if(isnotEmpty(nameField)&& isnotEmpty(startDateField) && isnotEmpty(ExpDateField) && isnotEmpty(usernameField) && isnotEmpty(passwordField)){
+                    if(isnotEmpty(nameField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(startDateField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(ExpDateField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(usernameField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(passwordField)){
+                        // just checking if empty
+                    }
                         
+                        
+                    if(isnotEmpty(nameField) && isnotEmpty(startDateField) && isnotEmpty(ExpDateField) && isnotEmpty(usernameField) && isnotEmpty(passwordField)){
+                        gym.addMember(new Members(name,parseDate(start),parseDate(exp),username,password));
+                        JOptionPane.showMessageDialog(cardPanel, "Sucessfully created a member");
+                        updateTableData();
+                        JTextField[] fields = {idField,nameField,startDateField,ExpDateField,usernameField,passwordField}; 
+                        clear(fields);  
+                    }else{
+                        error.setText("data fields must not be empty or null");
+                        error.setVisible(true);
                     }
                     
                 }  
@@ -516,23 +553,107 @@ public class dashboard extends gym {
         add(create);
         
     
-        read = new JButton("Update");
-        read.setBounds(665,335,100,40);
-        read.setBackground(Color.decode("#ff8b26"));
-        add(read);
-        
-        update = new JButton("Delete");
-        update.setBounds(665,385,100,40);
-        update.setBackground(Color.red);
+        update = new JButton("Update");
+        update.setBounds(665,335,100,40);
+        update.setBackground(Color.decode("#ff8b26"));
         add(update);
+        update.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String name= nameField.getText();
+                    String start = String.valueOf(startDateField.getText());
+                    String exp =  String.valueOf(ExpDateField.getText());
+                    String username = usernameField.getText();
+                    String password = passwordField.getText();
+                    
+                    if(isnotEmpty(nameField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(startDateField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(ExpDateField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(usernameField)){
+                        // just checking if empty
+                    }
+                    if(isnotEmpty(passwordField)){
+                        // just checking if empty
+                    }
+                           
+                    if(isnotEmpty(nameField) && isnotEmpty(startDateField) && isnotEmpty(ExpDateField) && isnotEmpty(usernameField) && isnotEmpty(passwordField)){
+                        Members member = gym.findMemberByID(Integer.parseInt(idField.getText()));
+                        
+                        member.setName(name);
+                        member.setStartDate(parseDate(start));
+                        member.setExpDate(parseDate(exp));
+                        member.setUsername(username);
+                        member.setPassword(password);
+                        JOptionPane.showMessageDialog(cardPanel, "Sucessfully updated a member");
+                        JTextField[] fields = {idField,nameField,startDateField,ExpDateField,usernameField,passwordField}; 
+                        clear(fields);
+                        updateTableData();
+                        
+                    }else{
+                        error.setText("data fields must not be empty or null");
+                        error.setVisible(true);
+                    }
+                    
+                  
+                }
+        });
+        
+        delete = new JButton("Delete");
+        delete.setBounds(665,385,100,40);
+        delete.setBackground(Color.red);
+        add(delete);
+        delete.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if(isnotEmpty(idField)){
+                        int choice = JOptionPane.showConfirmDialog(cardPanel, "Are you sure you want to delete user id " +idField.getText()+ " ?","Alert",JOptionPane.YES_NO_OPTION);
+                        
+                        switch(choice){
+                    
+                            case 0 -> { gym.removeMember(Integer.parseInt(idField.getText()));  updateTableData(); JTextField[] fields = {idField,nameField,startDateField,ExpDateField,usernameField,passwordField}; clear(fields);}
+                            
+                        }
+                    }
+                   
+                }
+        });
         
         clear = new JButton("Clear");
         clear.setBounds(665,435,100,40);
         clear.setBackground(Color.decode("#94a0ff"));
-        add(clear);
-        
+        clear.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JTextField[] fields = {idField,nameField,startDateField,ExpDateField,usernameField,passwordField};
+                    clear(fields);
+                }
+        });
+        add(clear);    
     }
+        public  void clear(JTextField[] fields){
+            for(JTextField e:fields){
+                    e.setText("");           
+            }
+        }
         
+        public static LocalDate parseDate(String dateString) {
+        if (dateString == null || dateString.trim().isEmpty()) {
+            throw new IllegalArgumentException("Date string cannot be null or empty");
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            return LocalDate.parse(dateString, formatter);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format, expected yyyy-MM-dd: " + dateString);
+        }
+    }
         public boolean isnotEmpty(JTextField field){
             
             if(field.getText().equals("") || field.getText() == null){
