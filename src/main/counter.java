@@ -11,6 +11,15 @@ package main;
 public class counter {
     static int count = 0;
     static int memberCount = 0;
+    static int employeeCount = 0;
+
+    public static int getEmployeeCount() {
+        return employeeCount;
+    }
+
+    public static void setEmployeeCount(int employeeCount) {
+        counter.employeeCount = employeeCount;
+    }
 
     public static int getCount() {
         return count;

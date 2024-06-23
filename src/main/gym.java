@@ -20,6 +20,7 @@ public class gym {
   static String username = "admin";
   static String password = "test123";
   static GymManagement gym = new GymManagement(5);
+  static Employees workers = new Employees(5);
   public static void main(String[] args) {
     
     gym.addMember(new Members("Alex", LocalDate.now().minusMonths(1), LocalDate.now(),"Alex","123"));
@@ -27,8 +28,11 @@ public class gym {
     
     gym.checkInMember(1, LocalDateTime.now());
     gym.checkInMember(2, LocalDateTime.now());
- 
-    login();
+    
+    workers.addEmployee(new Employees("Kulash Mithril","Trainer","0932-328-232"));
+    workers.addEmployee(new Employees("Kulash Mithril","Trainer","0932-328-232"));
+    
+    new dashboard();
     
   }
   
@@ -102,7 +106,7 @@ public class gym {
                         if (member.getUsername().equals(Username) && member.getPassword().equals(Password)) {
                         found = true;
                         frame.dispose();
-                        new userPage(); 
+                        new userPage(member.getMembershipId()); 
                         break;
                         }
                     }

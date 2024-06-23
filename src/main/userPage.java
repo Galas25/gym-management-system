@@ -5,6 +5,7 @@
 package main;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 
@@ -13,17 +14,18 @@ public class userPage {
     
     
     
-    public userPage(){
+    public userPage(int id){
         SwingUtilities.invokeLater(() -> {
-           createUI();
+           createUI(id);
         });
     }
-    public void createUI(){
+    public void createUI(int id){
          mainFrame.setSize(500,500);
          mainFrame.setLocationRelativeTo(null);
          mainFrame.setVisible(true);
          mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
+         JLabel d = new JLabel(String.valueOf(id));
+         mainFrame.add(d);
         
     }
 }

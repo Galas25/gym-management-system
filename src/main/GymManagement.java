@@ -21,7 +21,7 @@ public class GymManagement {
         members = new Members[size];
         count = 0; 
     }
-     private void resizeMembersArray() {
+    private void resizeMembersArray() {
         int newSize = members.length * 2; // Double the size of the current array
         Members[] newArray = new Members[newSize];
         // Copy existing members to the new array
@@ -67,8 +67,6 @@ public class GymManagement {
     }
 }
 
- 
-    
    public Members findMemberByID(int membershipID) {
         for (int i = 0; i < count; i++) {
             if (members[i].getMembershipId() == membershipID) {
@@ -157,6 +155,9 @@ public class GymManagement {
     public void setCount(int count) {
         this.count = count;
     }
+
+    
+    
    
 }
 
