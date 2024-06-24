@@ -32,7 +32,7 @@ public class gym {
     workers.addEmployee(new Employees("Kulash Mithril","Trainer","0932-328-232"));
     workers.addEmployee(new Employees("Kulash Mithril","Trainer","0932-328-232"));
     
-    new dashboard();
+    login();
     
   }
   
@@ -122,10 +122,7 @@ public class gym {
                     errorLabel.setText("Wrong password or Username");
                     errorLabel.setVisible(true);
                 }
-                    
-                
-                    
-        
+                      
  
         }
     });
@@ -218,9 +215,6 @@ public class gym {
     label.setBounds(160, -20 , 200, 100);
     label.setFont(new Font("Times New Roman", Font.PLAIN, 20));
     frame.add(label);
-    
-    
-    
     
     JButton register = new JButton("Register");
 
