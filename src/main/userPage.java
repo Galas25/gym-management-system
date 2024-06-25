@@ -10,8 +10,14 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -21,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
-import static main.dashboard.username;
 
 
 public class userPage extends gym{
@@ -29,14 +34,34 @@ public class userPage extends gym{
     
     CardLayout cardLayout = new CardLayout();
     JPanel cardPanel = new JPanel(cardLayout);
-    
+    private Members member;
     private String memberUsername;
-
-    public userPage(String memberUsername) {
+    private String firstName;
+    private String lastName;
+    private String contact;
+    private boolean checkedIn;
+    
+    public userPage(String memberUsername, Members members) {
         SwingUtilities.invokeLater(() -> {
             this.memberUsername = memberUsername;
+            this.member = members;
+            
+            String fullNameofMember = member.getName();
+            String[] nameParts = fullNameofMember.split(" ");
+            this.firstName = capitalizeFirstLetter(nameParts[0]);
+            this.lastName = capitalizeFirstLetter(nameParts[nameParts.length - 1]);;
+            this.contact = members.getContact();
+            
+            
         createUI();
         });
+    }
+    
+    public static String capitalizeFirstLetter(String str) {
+        if (str == null || str.isEmpty()) {
+            return str; // Return null or empty string as is
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
     
     public void createUI(){
@@ -78,19 +103,59 @@ public class userPage extends gym{
         profile.setIcon(scaledIcon);
         p2.add(profile);
 
-        JLabel nameLbl = new JLabel(memberUsername, JLabel.CENTER);
+        JLabel nameLbl = new JLabel(firstName, JLabel.CENTER);
         nameLbl.setBounds(50, 120, 100, 100);
         nameLbl.setFont(new java.awt.Font("Inter SemiBold", Font.BOLD, 30));
         p2.add(nameLbl);
 
         JButton checkIn = new JButton("Check-In");
         checkIn.setBounds(50, 200, 100, 40);
+        
+        checkIn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                if(checkedIn){
+                
+                    JOptionPane.showMessageDialog(mainFrame, "You already are checked in, please check out first.", "Warning", JOptionPane.WARNING_MESSAGE);
+                
+                }else{
+            
+                    member.checkInTime = LocalDateTime.now();
+                    JOptionPane.showMessageDialog(mainFrame, "Successfully checked in", "Information", JOptionPane.INFORMATION_MESSAGE);
+                    checkedIn = true;
+                
+                }
+                
+                
+                
+            }
+        });
         p2.add(checkIn);
         
         JButton checkOut = new JButton("Check-Out");
         checkOut.setBounds(50, 250, 100, 40);
         p2.add(checkOut);
 
+        checkOut.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                if(checkedIn){
+                
+                    JOptionPane.showMessageDialog(mainFrame, "Sucessfully checked out", "Information", JOptionPane.INFORMATION_MESSAGE);
+                    member.checkOutTime = LocalDateTime.now();
+                    checkedIn = false;
+                
+                }else{
+                    JOptionPane.showMessageDialog(mainFrame, "You are not checked in, check in first.", "Warning", JOptionPane.WARNING_MESSAGE);
+                }
+                
+                
+                
+            }
+        });
+        
 
         JLabel logout = new JLabel("LOG-OUT", JLabel.CENTER);
         logout.setForeground(Color.white);
@@ -131,6 +196,27 @@ public class userPage extends gym{
         mainFrame.setVisible(true); // Set frame visible after all components are added
     }
 
+    private String expDateCalculator(Members member){
+    
+        LocalDate expDate = member.getExpDate();
+        
+        // Current date
+        LocalDate currentDate = member.getStartDate();
+        
+        // Calculate days left until the expiration date
+        long daysLeft = ChronoUnit.DAYS.between(currentDate, expDate);
+        
+        // Calculate months and days left until the expiration date
+        Period period = Period.between(currentDate, expDate);
+        int monthsLeft = period.getMonths();
+        int daysInMonthLeft = period.getDays();
+        
+        // Display the results
+        // System.out.println("Days left until expiring: " + daysLeft);
+        String message = monthsLeft + " months,  " + daysInMonthLeft + " days";
+        return message;
+    }
+    
     class OverviewPanel extends JPanel {
         public OverviewPanel() {
             setBackground(Color.decode("#ebebeb"));
@@ -153,7 +239,8 @@ public class userPage extends gym{
             mainPanel.add(dumbbell);
             
             add(mainPanel);
-
+            
+            
 
             JLabel welcome = new JLabel("Welcome!");
             welcome.setBounds(20, -10, 400, 100);
@@ -161,12 +248,12 @@ public class userPage extends gym{
             mainPanel.add(welcome);
 
             // JLabel user = new JLabel("(Last Name)" + ", " + memberUsername);
-            JLabel username = new JLabel("(Last Name)");//Change "Last Name"
+            JLabel username = new JLabel(firstName);//Change "Last Name"
             username.setBounds(20, 40, 400, 100);
             username.setFont(new Font("Segoe UI", Font.BOLD, 55));
             mainPanel.add(username);
 
-            JLabel firstname = new JLabel(memberUsername);
+            JLabel firstname = new JLabel(lastName);
             firstname.setBounds(20, 100, 400, 100);
             firstname.setFont(new Font("Segoe UI", Font.BOLD, 45));
             mainPanel.add(firstname);
@@ -186,7 +273,8 @@ public class userPage extends gym{
             status.setFont(new Font("Segoe UI", Font.BOLD, 20));
             bottomLeft.add(status);
 
-            JLabel currentStatus = new JLabel("Current Status");
+            String membershipStatus = member.getStartDate().isBefore(member.getExpDate()) ? "Active" : "Expired";
+            JLabel currentStatus = new JLabel(membershipStatus);
             currentStatus.setBounds(85, 10, 300, 90);
             currentStatus.setFont(new Font("Segoe UI", Font.PLAIN, 20));
             bottomLeft.add(currentStatus);
@@ -196,7 +284,7 @@ public class userPage extends gym{
             expiresIn.setFont(new Font("Segoe UI", Font.BOLD, 20));
             bottomLeft.add(expiresIn);
 
-            JLabel expireDate = new JLabel("Expires Date");
+            JLabel expireDate = new JLabel(expDateCalculator(member));
             expireDate.setBounds(120, 40, 300, 90);
             expireDate.setFont(new Font("Segoe UI", Font.PLAIN, 20));
             bottomLeft.add(expireDate);
@@ -219,7 +307,7 @@ public class userPage extends gym{
             name.setFont(new Font("Segoe UI", Font.BOLD, 20));
             bottomRight.add(name);
 
-            JLabel fullName = new JLabel("Last Name" + ", " + memberUsername);
+            JLabel fullName = new JLabel(lastName + ", " + firstName);
             fullName.setBounds(85, 10, 300, 90);
             fullName.setFont(new Font("Segoe UI", Font.PLAIN, 20));
             bottomRight.add(fullName);
@@ -229,7 +317,7 @@ public class userPage extends gym{
             contactInfo.setFont(new Font("Segoe UI", Font.BOLD, 20));
             bottomRight.add(contactInfo);
 
-            JLabel contactNumber = new JLabel("Contact Number");
+            JLabel contactNumber = new JLabel(contact);
             contactNumber.setBounds(100, 40, 300, 90);
             contactNumber.setFont(new Font("Segoe UI", Font.PLAIN, 20));
             bottomRight.add(contactNumber);

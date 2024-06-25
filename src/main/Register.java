@@ -1,8 +1,17 @@
 package main;
+import java.awt.BorderLayout;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionListener;
+
 import java.awt.event.*;
 
 public class Register extends JFrame {
@@ -33,6 +42,23 @@ public class Register extends JFrame {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10); // Padding
 
+        JButton back = new JButton("Back");
+        back.setBounds(20, 20, 100, 30);
+        back.setBackground(Color.lightGray);
+        back.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               
+                dispose();
+                new login();
+                
+            }
+        });
+
+        mainPanel.add(back);
+        
+        
+        
         // Title Label
         titleLabel = new JLabel("Signup Form", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
