@@ -12,6 +12,15 @@ public class counter {
     static int count = 0;
     static int memberCount = 0;
     static int employeeCount = 0;
+    static int equipmentCount = 0;
+
+    public static int getEquipmentCount() {
+        return equipmentCount;
+    }
+
+    public static void setEquipmentCount(int equipmentCount) {
+        counter.equipmentCount = equipmentCount;
+    }
 
     public static int getEmployeeCount() {
         return employeeCount;

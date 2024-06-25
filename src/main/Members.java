@@ -12,8 +12,10 @@ public class Members {
     LocalDate expDate;
     LocalDateTime checkInTime;
     LocalDateTime checkOutTime;
+    String membershipType;
+    String contact;
     
-    Members(String Name, LocalDate startDate, LocalDate ExpDate, String username, String password){
+    Members(String Name, LocalDate startDate, LocalDate ExpDate, String username, String password, String membershipType, String contact){
     
         this.Name = Name;
         this.membershipId =  memId();
@@ -21,7 +23,25 @@ public class Members {
         this.expDate = ExpDate;
         this.username = username;
         this.password = password;
+        this.membershipType = membershipType;
+        this.contact = contact;
     
+    }
+
+    public String getMembershipType() {
+        return membershipType;
+    }
+
+    public void setMembershipType(String membershipType) {
+        this.membershipType = membershipType;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     public String getUsername() {

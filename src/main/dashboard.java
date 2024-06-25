@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -160,6 +161,7 @@ public class dashboard extends gym {
         Overview.setBorder(BorderFactory.createBevelBorder(1));
         Overview.setForeground(Color.WHITE);
 
+        
         // Add cards to cardPanel
         cardPanel.add(new OverviewPanel(), "Overview");
         cardPanel.add(new MembersPanel(), "Members");
@@ -258,6 +260,8 @@ public class dashboard extends gym {
         panel.add(p2);
     }
     class OverviewPanel extends JPanel {
+        
+
         public OverviewPanel() {
             setBackground(Color.decode("#ebebeb"));
             setLayout(null);
@@ -323,10 +327,12 @@ public class dashboard extends gym {
             p2.setLayout(null);
             p2.setBounds(540, 20, 225, 200);
             p2.setBackground(Color.white);
-            JLabel title = new JLabel("Equipments");
+            JLabel title = new JLabel("Employees");
             title.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             title.setBounds(10, -30, 200, 100);
-            JLabel number = new JLabel("323");
+           
+            JLabel number = new JLabel(String.valueOf(counter.getEmployeeCount()));
+            
             number.setFont(new Font("Open Sans", Font.BOLD, 80));
             number.setBounds(0, 0, 225, 200);
             number.setHorizontalAlignment(JLabel.CENTER);
@@ -339,6 +345,8 @@ public class dashboard extends gym {
             infoPanel(this, 20, "Total Members", String.valueOf(gym.getCount()));
             infoPanel(this, 240, "Active Members", String.valueOf(gym.activeMembers()));
             infoPanel(this, 460, "Check-Ins Today", String.valueOf(gym.checkinToday()));
+
+            
         }
     }
     static class PaddedCellRenderer extends DefaultTableCellRenderer {
@@ -369,13 +377,13 @@ public class dashboard extends gym {
 
         private void updateTableData() {
             dtm.setRowCount(0); // Clear existing rows
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, yy", Locale.ENGLISH);
             for (Members member: gym.getMembers()) {
                 if (member != null) {
                     String formattedStartDate = member.getStartDate().format(dateTimeFormatter);
                     String formattedExpDate = member.getExpDate().format(dateTimeFormatter);
                     dtm.addRow(new Object[] {
-                        member.getMembershipId(), member.getName(), formattedStartDate, formattedExpDate, member.username, member.password
+                        member.getMembershipId(), member.getName(),  member.getMembershipType(), formattedStartDate, formattedExpDate, member.username, member.password, member.getContact()
                     });
                 }
             }
@@ -404,13 +412,15 @@ public class dashboard extends gym {
             
             dtm.addColumn("ID");
             dtm.addColumn("NAME");
-            dtm.addColumn("STARTDATE");
-            dtm.addColumn("EXPIREDATE");
+            dtm.addColumn("MEMBERSHIP");
+            dtm.addColumn("START");
+            dtm.addColumn("EXPIRE");
             dtm.addColumn("USERNAME");
             dtm.addColumn("PASSWORD");
+            dtm.addColumn("CONTACT");
 
             // Example data
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMM d, yy", Locale.ENGLISH);
             // Replace this with your actual data retrieval logic
             
             for (Members members: gym.getMembers()) {
@@ -419,7 +429,7 @@ public class dashboard extends gym {
                     String formattedStartDate = members.getStartDate().format(dateTimeFormatter);
                     String formattedExpDate = members.getExpDate().format(dateTimeFormatter);
                     dtm.addRow(new Object[] {
-                        members.getMembershipId(), members.getName(), formattedStartDate, formattedExpDate, members.getUsername(), members.getPassword()
+                        members.getMembershipId(),  members.getName(), members.getMembershipType(), formattedStartDate, formattedExpDate, members.getUsername(), members.getPassword(), members.getContact()
                     });
                 }
 
@@ -456,7 +466,7 @@ public class dashboard extends gym {
 
             JPanel infoPanel = new JPanel();
             infoPanel.setBounds(20, 290, 625, 180);
-            infoPanel.setLayout(null);
+            infoPanel.setLayout(new GridBagLayout());
             infoPanel.setBackground(Color.white);
             TitledBorder titledBorder = BorderFactory.createTitledBorder("Information");
             titledBorder.setTitleJustification(TitledBorder.CENTER);
@@ -464,71 +474,189 @@ public class dashboard extends gym {
             add(infoPanel);
 
             JLabel id = new JLabel("MembershipId");
-            id.setBounds(20, 20, 150, 30);
-            infoPanel.add(id);
+            JLabel name = new JLabel("Name");
+            JLabel error = new JLabel("username or password is incorrect.");
+            JLabel startDate = new JLabel("Start Date");
+            JLabel expDate = new JLabel("Expire-Date");
+            JLabel username = new JLabel("Username");
+            JLabel password = new JLabel("Password");
+            JLabel membershipTypeLbl = new JLabel("Membership Type");
+            JLabel contactNoLbl = new JLabel("Contact Number");
 
             JTextField idField = new JTextField();
+            JTextField nameField = new JTextField();
+            JTextField startDateField = new JTextField();
+            JTextField expDateField = new JTextField();
+            JTextField usernameField = new JTextField();
+            JTextField passwordField = new JTextField();
+            JComboBox<String> membershipType = new JComboBox<>();
+            JTextField contactNoField = new JTextField();
+
+            membershipType.addItem("Regular");
+            membershipType.addItem("Silver");
+            membershipType.addItem("Gold");
+
             idField.setEditable(false);
             idField.setFocusable(false);
             idField.setForeground(Color.BLACK);
-            idField.setBounds(20, 50, 150, 30);
-            infoPanel.add(idField);
 
-            JLabel name = new JLabel("Name");
-            name.setBounds(20, 80, 150, 30);
-            infoPanel.add(name);
-
-            JTextField nameField = new JTextField();
-            nameField.setBounds(20, 110, 150, 30);
-            infoPanel.add(nameField);
-
-            JLabel error = new JLabel("username or password is incorrect.");
-            error.setBounds(20, 150, 585, 20);
             error.setForeground(Color.decode("#721c24"));
             error.setBackground(Color.decode("#f8d7da"));
             error.setOpaque(true);
             error.setHorizontalAlignment(JLabel.CENTER);
             error.setVerticalTextPosition(JLabel.CENTER);
-            error.setBorder(BorderFactory.createLineBorder(Color.decode("#f5c6cb"), 1));
+            error.setBorder(BorderFactory.createLineBorder(Color.decode("#f5c6cb")));
             error.setFont(new Font("Segoe UI", Font.PLAIN, 14));
             error.setCursor(new Cursor(Cursor.HAND_CURSOR));
             error.setVisible(false);
-
-            infoPanel.add(error);
-
-            JLabel startDate = new JLabel("Start Date");
             startDate.setToolTipText("Format [Year/Month/Day] (2024-06-21)");
-            startDate.setBounds(190, 20, 150, 30);
-            infoPanel.add(startDate);
 
-            JTextField startDateField = new JTextField();
-            startDateField.setBounds(190, 50, 150, 30);
-            infoPanel.add(startDateField);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(5, 5, 5, 5);
+            gbc.anchor = GridBagConstraints.WEST;
 
-            JLabel ExpDate = new JLabel("Expire-Date");
-            ExpDate.setBounds(190, 80, 150, 30);
-            infoPanel.add(ExpDate);
+            // Row 1
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 1;
+            infoPanel.add(id, gbc);
 
-            JTextField ExpDateField = new JTextField();
-            ExpDateField.setBounds(190, 110, 150, 30);
-            infoPanel.add(ExpDateField);
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+            gbc.gridwidth = 1; // Adjusted to 1
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 0.5;
+            infoPanel.add(idField, gbc);
 
-            JLabel username = new JLabel("Username");
-            username.setBounds(360, 20, 150, 30);
-            infoPanel.add(username);
+            gbc.gridx = 2;
+            gbc.gridy = 0;
+            gbc.gridwidth = 1;
+            infoPanel.add(name, gbc);
 
-            JTextField usernameField = new JTextField();
-            usernameField.setBounds(360, 50, 150, 30);
-            infoPanel.add(usernameField);
+            gbc.gridx = 3;
+            gbc.gridy = 0;
+            gbc.gridwidth = 2; // Adjusted to 2
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(nameField, gbc);
 
-            JLabel password = new JLabel("Password");
-            password.setBounds(360, 80, 150, 30);
-            infoPanel.add(password);
+            // Row 2
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            gbc.gridwidth = 1;
+            infoPanel.add(startDate, gbc);
 
-            JTextField passwordField = new JTextField();
-            passwordField.setBounds(360, 110, 150, 30);
-            infoPanel.add(passwordField);
+            gbc.gridx = 1;
+            gbc.gridy = 1;
+            gbc.gridwidth = 1; // Adjusted to 1
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(startDateField, gbc);
 
+            gbc.gridx = 2;
+            gbc.gridy = 1;
+            gbc.gridwidth = 1;
+            infoPanel.add(expDate, gbc);
+
+            gbc.gridx = 3;
+            gbc.gridy = 1;
+            gbc.gridwidth = 1; // Adjusted to 1
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(expDateField, gbc);
+
+            // Row 3
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.gridwidth = 1;
+            infoPanel.add(username, gbc);
+
+            gbc.gridx = 1;
+            gbc.gridy = 2;
+            gbc.gridwidth = 1; // Adjusted to 1
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(usernameField, gbc);
+
+            gbc.gridx = 2;
+            gbc.gridy = 2;
+            gbc.gridwidth = 1;
+            infoPanel.add(password, gbc);
+
+            gbc.gridx = 3;
+            gbc.gridy = 2;
+            gbc.gridwidth = 1; // Adjusted to 1
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(passwordField, gbc);
+
+            // Row 4
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.gridwidth = 1;
+            infoPanel.add(membershipTypeLbl, gbc);
+
+            gbc.gridx = 1;
+            gbc.gridy = 3;
+            gbc.gridwidth = 1; // Adjusted to 1
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(membershipType, gbc);
+
+            gbc.gridx = 2;
+            gbc.gridy = 3;
+            gbc.gridwidth = 1;
+            infoPanel.add(contactNoLbl, gbc);
+
+            gbc.gridx = 3;
+            gbc.gridy = 3;
+            gbc.gridwidth = 1; // Adjusted to 1
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(contactNoField, gbc);
+
+            // Row 5
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            gbc.gridwidth = 4; // Combined width for error message
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            infoPanel.add(error, gbc);
+
+            membershipType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               
+                String choice = membershipType.getSelectedItem().toString();
+                LocalDate start;
+                
+                switch(choice){
+                    case "Regular":
+                        if(startDateField.getText().isEmpty()){      
+                            startDateField.setText(LocalDate.now().toString());
+                            expDateField.setText(LocalDate.now().plusMonths(1).toString());
+                        }else{
+                            start = parseDate(startDateField.getText());
+                            expDateField.setText(start.plusMonths(1).toString());
+                        }
+                        break;
+                    case "Silver":
+                        if(startDateField.getText().isEmpty()){      
+                            startDateField.setText(LocalDate.now().toString());
+                            expDateField.setText(LocalDate.now().plusMonths(3).toString());
+                        }else{
+                            start = parseDate(startDateField.getText());
+                            expDateField.setText(start.plusMonths(3).toString());
+                        }
+                            
+                        break;
+                    case "Gold":
+                        if(startDateField.getText().isEmpty()){      
+                            startDateField.setText(LocalDate.now().toString());
+                            expDateField.setText(LocalDate.now().plusMonths(5).toString());
+                        }else{
+                            start = parseDate(startDateField.getText());
+                            expDateField.setText(start.plusMonths(5).toString());
+                        }
+                        break;  
+                    default:
+                }   
+            }
+            });
+            
+            
             table.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -538,12 +666,10 @@ public class dashboard extends gym {
                     idField.setText(String.valueOf(member.getMembershipId()));
                     nameField.setText(member.getName());
                     startDateField.setText(String.valueOf(member.getStartDate()));
-                    ExpDateField.setText(String.valueOf(member.getExpDate()));
+                    expDateField.setText(String.valueOf(member.getExpDate()));
                     usernameField.setText(member.getUsername());
                     passwordField.setText(member.getPassword());
-                    
-                    
-                    
+                    contactNoField.setText(member.getContact());   
                 }
             });
 
@@ -553,7 +679,7 @@ public class dashboard extends gym {
                     error.setVisible(false);
                     nameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     startDateField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-                    ExpDateField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                    expDate.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     usernameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     passwordField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                 }
@@ -584,14 +710,50 @@ public class dashboard extends gym {
                     JLabel passwordLbl = new JLabel("Password");
                     JLabel startDateLbl = new JLabel("Start Date");
                     JLabel expDateLbl = new JLabel("Exp Date");
+                    JLabel membershipTypeLbl = new JLabel("Membership Type");
+                    JLabel contactLbl = new JLabel("Contact No");
+                    JTextField contactField = new JTextField(10);
                     JTextField cnameField = new JTextField(10);
                     JTextField cuserNameField = new JTextField(10);
                     JTextField cpasswordField = new JTextField(10);
                     JTextField cstartDateField = new JTextField(10);
                     JTextField cexpDateField = new JTextField(10);
+                    JComboBox<String> membershipType = new JComboBox<>();
                     JButton createBtn = new JButton("Create");
                     JLabel error2 = new JLabel("username or password is incorrect.");
 
+                    membershipType.addItem("Regular");
+                    membershipType.addItem("Silver");
+                    membershipType.addItem("Gold");
+                    cstartDateField.setText(String.valueOf(LocalDate.now()));
+                    cexpDateField.setText(String.valueOf(LocalDate.now().plusMonths(1)));
+                    
+                    membershipType.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String choice = (String) membershipType.getSelectedItem();
+                            switch (choice) {
+                                case "Regular":
+                                    cstartDateField.setText(String.valueOf(LocalDate.now()));
+                                    cexpDateField.setText(String.valueOf(LocalDate.now().plusMonths(1)));
+                                    break;
+                                case "Silver":
+                                    cstartDateField.setText(String.valueOf(LocalDate.now()));
+                                    cexpDateField.setText(String.valueOf(LocalDate.now().plusMonths(3)));
+                                    break;
+                                case "Gold":
+                                    cstartDateField.setText(String.valueOf(LocalDate.now()));
+                                    cexpDateField.setText(String.valueOf(LocalDate.now().plusMonths(5)));
+                                    break;
+                                default:
+                                    cstartDateField.setText("");
+                                    cexpDateField.setText("");
+                                    break;
+                            }
+                        }
+                    });
+                    
+                            
                     cstartDateField.setEditable(false);
                     cexpDateField.setEditable(false);
                     cstartDateField.setFocusable(false);
@@ -619,8 +781,7 @@ public class dashboard extends gym {
                     cuserNameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     cpasswordField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 
-                    cstartDateField.setText(String.valueOf(LocalDate.now()));
-                    cexpDateField.setText(String.valueOf(LocalDate.now().plusMonths(1)));
+
                     createBtn.setBackground(Color.green);
 
                     createBtn.addMouseListener(new MouseAdapter() {
@@ -628,15 +789,18 @@ public class dashboard extends gym {
                         public void mouseClicked(MouseEvent e) {
                             String name = cnameField.getText();
                             String start = String.valueOf(cstartDateField.getText());
-                            String exp = String.valueOf(ExpDateField.getText());
+                            String exp = String.valueOf(cexpDateField.getText());
                             String username = cuserNameField.getText();
                             String password = cpasswordField.getText();
+                            String membership = membershipType.getSelectedItem().toString();
+                            String contact = contactField.getText();
 
                             isnotEmpty(cnameField);
                             isnotEmpty(cuserNameField);
                             isnotEmpty(cpasswordField);
+                            isnotEmpty(contactField);
 
-                            if (isnotEmpty(cnameField) && isnotEmpty(cuserNameField) && isnotEmpty(cpasswordField)) {
+                            if (isnotEmpty(cnameField) && isnotEmpty(cuserNameField) && isnotEmpty(cpasswordField) && isnotEmpty(contactField)) {
 
                                 boolean sameUsername = false;
                                 for (Members member: gym.getMembers()) {
@@ -651,15 +815,31 @@ public class dashboard extends gym {
                                     error2.setText("existing username");
                                     error2.setVisible(true);
                                 } else {
-                                    gym.addMember(new Members(name, parseDate(start), parseDate(exp), username, password));
+                                    gym.addMember(new Members(name, parseDate(start), parseDate(exp), username, password, membership, contact));
                                     JOptionPane.showMessageDialog(cardPanel, "Sucessfully created a member");
                                     updateTableData();
                                     JTextField[] fields = {
                                         cnameField,
+                                        cuserNameField,
                                         usernameField,
-                                        cpasswordField
+                                        cpasswordField,
+                                        contactField
+                                    };
+                                    JTextField[] field = {
+                                        idField,
+                                        nameField,
+                                        startDateField,
+                                        expDateField,
+                                        usernameField,
+                                        passwordField,
+                                        contactNoField
                                     };
                                     clear(fields);
+                                    membershipType.setSelectedIndex(0);
+                                    clear(field);
+                                    
+                                    createForm.dispose();
+                                    
                                 }
 
                             } else {
@@ -692,25 +872,39 @@ public class dashboard extends gym {
 
                     gbc.gridx = 1;
                     createForm.add(cpasswordField, gbc);
-
+                    
                     gbc.gridx = 0;
                     gbc.gridy = 3;
+                    createForm.add(contactLbl, gbc);
+
+                    gbc.gridx = 1;
+                    createForm.add(contactField, gbc);
+                    
+                    gbc.gridx = 0;
+                    gbc.gridy = 4;
+                    createForm.add(membershipTypeLbl, gbc);
+
+                    gbc.gridx = 1;
+                    createForm.add(membershipType, gbc);
+                    
+                    gbc.gridx = 0;
+                    gbc.gridy = 5;
                     createForm.add(startDateLbl, gbc);
 
                     gbc.gridx = 1;
                     createForm.add(cstartDateField, gbc);
 
                     gbc.gridx = 0;
-                    gbc.gridy = 4;
+                    gbc.gridy = 6;
                     createForm.add(expDateLbl, gbc);
 
                     gbc.gridx = 1;
                     createForm.add(cexpDateField, gbc);
 
-                    gbc.gridy = 5;
+                    gbc.gridy = 7;
                     gbc.gridx = 1;
                     createForm.add(createBtn, gbc);
-                    gbc.gridy = 6;
+                    gbc.gridy = 8;
                     gbc.gridx = 1;
                     createForm.add(error2, gbc);
                     // Center the frame
@@ -730,17 +924,20 @@ public class dashboard extends gym {
                 public void actionPerformed(ActionEvent e) {
                     String name = nameField.getText();
                     String start = String.valueOf(startDateField.getText());
-                    String exp = String.valueOf(ExpDateField.getText());
+                    String exp = String.valueOf(expDate.getText());
                     String username = usernameField.getText();
                     String password = passwordField.getText();
+                    String membership = membershipType.getSelectedItem().toString();
+                    String contact = contactNoField.getText();
 
                     isnotEmpty(nameField);
                     isnotEmpty(startDateField);
-                    isnotEmpty(ExpDateField);
+                    isnotEmpty(expDateField);
                     isnotEmpty(usernameField);
                     isnotEmpty(passwordField);
+                    isnotEmpty(contactNoField);
 
-                    if (isnotEmpty(nameField) && isnotEmpty(startDateField) && isnotEmpty(ExpDateField) && isnotEmpty(usernameField) && isnotEmpty(passwordField)) {
+                    if (isnotEmpty(nameField) && isnotEmpty(startDateField) && isnotEmpty(expDateField) && isnotEmpty(usernameField) && isnotEmpty(passwordField) && isnotEmpty(contactNoField)) {
                         Members member = gym.findMemberByID(Integer.parseInt(idField.getText()));
 
                         member.setName(name);
@@ -748,15 +945,19 @@ public class dashboard extends gym {
                         member.setExpDate(parseDate(exp));
                         member.setUsername(username);
                         member.setPassword(password);
+                        member.setMembershipType(membership);
+                        member.setContact(contact);
                         JOptionPane.showMessageDialog(cardPanel, "Sucessfully updated a member");
                         JTextField[] fields = {
                             idField,
                             nameField,
                             startDateField,
-                            ExpDateField,
+                            expDateField,
                             usernameField,
-                            passwordField
+                            passwordField,
+                            contactNoField
                         };
+                        membershipType.setSelectedIndex(0);
                         clear(fields);
                         updateTableData();
 
@@ -781,14 +982,19 @@ public class dashboard extends gym {
                         switch (choice) {
 
                         case 0 -> {
-                            gym.removeMember(Integer.parseInt(idField.getText()));updateTableData();JTextField[] fields = {
+                            gym.removeMember(Integer.parseInt(idField.getText()));updateTableData();
+                            JTextField[] fields = {
                                 idField,
                                 nameField,
                                 startDateField,
-                                ExpDateField,
+                                expDateField,
                                 usernameField,
-                                passwordField
-                            };clear(fields);
+                                passwordField,
+                                contactNoField
+                                    
+                            };
+                            membershipType.setSelectedIndex(0);
+                            clear(fields);
                         }
 
                         }
@@ -807,11 +1013,14 @@ public class dashboard extends gym {
                         idField,
                         nameField,
                         startDateField,
-                        ExpDateField,
+                        expDateField,
                         usernameField,
-                        passwordField
+                        passwordField,
+                        contactNoField
                     };
+                    membershipType.setSelectedIndex(0);
                     clear(fields);
+                    
                 }
             });
             add(clear);
@@ -1581,7 +1790,6 @@ return totalEarnings;
     }
     
 
-
     class EquipmentsPanel extends JPanel {
         
         private JTable table;
@@ -1651,6 +1859,7 @@ return totalEarnings;
             tableModel.addRow(new Object[]{"Stationary Bike", "3", "Operational", "Needs Maintenance"});
             tableModel.addRow(new Object[]{"Dumbbell Rack", "4", "Missing", "Two Dumbbells are missing"});
             tableModel.addRow(new Object[]{"Elliptical Trainer", "5", "Available", "Good Condition"});
+            
             
             JPanel inputPanel = new JPanel(new GridBagLayout());
             inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -1762,6 +1971,7 @@ return totalEarnings;
                 }
 
                 if (selectedRow == -1) {
+                    counter.setEquipmentCount(counter.getEquipmentCount() + 1);
                     tableModel.addRow(new Object[]{name, quantity, status, remarks});
                 } else {
                     tableModel.setValueAt(name, selectedRow, 0);
@@ -1779,6 +1989,7 @@ return totalEarnings;
                 if (selectedRow != -1) {
                     tableModel.removeRow(selectedRow);
                     selectedRow = -1;
+                    counter.setEquipmentCount(counter.getEquipmentCount() - 1);
                     clearFields();
                 } else {
                     JOptionPane.showMessageDialog(this, "Please select a row to delete", "Error", JOptionPane.ERROR_MESSAGE);

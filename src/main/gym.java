@@ -23,8 +23,8 @@ public class gym {
   static Employees workers = new Employees(5);
   public static void main(String[] args) {
     
-    gym.addMember(new Members("Alex", LocalDate.now().minusMonths(1), LocalDate.now(),"Alex","123"));
-    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(1),"Galas","2555"));
+    gym.addMember(new Members("Alex", LocalDate.now().minusMonths(1), LocalDate.now().minusMonths(1).plusMonths(1),"Alex","123","Regular","0998333554"));
+    gym.addMember(new Members("esd", LocalDate.now(), LocalDate.now().plusMonths(3),"Galas","2555","Silver","0554882125"));
     
     gym.checkInMember(1, LocalDateTime.now());
     gym.checkInMember(2, LocalDateTime.now());
