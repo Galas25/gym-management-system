@@ -162,6 +162,7 @@ public class Register extends JFrame {
                     }
 
                     new Subscription(firstName+" "+lastName, email, username, password);
+                    dispose();
                 } else {
                     JOptionPane.showMessageDialog(Register.this,
                             "Please fill in all fields!",

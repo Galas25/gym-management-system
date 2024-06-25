@@ -159,7 +159,9 @@ public class Subscription extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 
                 gym.addMember(new  Members(name, currentDate, dueDate, username, password, membershipType, email));
+                dispose();
                 new login();
+                
                 
             }
         });
