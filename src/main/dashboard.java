@@ -5,6 +5,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -17,14 +18,18 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -33,6 +38,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -56,9 +62,10 @@ public class dashboard extends gym {
 
     CardLayout cardLayout = new CardLayout();
     JPanel cardPanel = new JPanel(cardLayout);
-
-    public dashboard() {
+    static String username;
+    public dashboard(String username1) {
         SwingUtilities.invokeLater(() -> {
+            username = username1;
             createUI();
         });
     }
@@ -103,7 +110,7 @@ public class dashboard extends gym {
         profile.setIcon(scaledIcon);
         p2.add(profile);
 
-        JLabel nameLbl = new JLabel("Admin", JLabel.CENTER);
+        JLabel nameLbl = new JLabel(username, JLabel.CENTER);
         nameLbl.setBounds(50, 120, 100, 100);
         nameLbl.setFont(new java.awt.Font("Inter SemiBold", Font.BOLD, 20));
         p2.add(nameLbl);
@@ -262,7 +269,7 @@ public class dashboard extends gym {
             welcome.setFont(new Font("Segoe UI", Font.PLAIN, 20));
             p1.add(welcome);
 
-            JLabel name = new JLabel("User");
+            JLabel name = new JLabel(username);
             name.setBounds(20, 20, 400, 100);
             name.setFont(new Font("Segoe UI", Font.BOLD, 62));
             p1.add(name);
@@ -357,7 +364,7 @@ public class dashboard extends gym {
     }
 
     class MembersPanel extends JPanel {
-        DefaultTableModel dtm = new DefaultTableModel();
+        DefaultTableModel dtm;
 
         private void updateTableData() {
             dtm.setRowCount(0); // Clear existing rows
@@ -386,6 +393,14 @@ public class dashboard extends gym {
 
             // Create the table model and the table
 
+            dtm = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are non-editable
+                return false;
+            }
+            };
+            
             dtm.addColumn("ID");
             dtm.addColumn("NAME");
             dtm.addColumn("STARTDATE");
@@ -396,6 +411,7 @@ public class dashboard extends gym {
             // Example data
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH);
             // Replace this with your actual data retrieval logic
+            
             for (Members members: gym.getMembers()) {
 
                 if (members != null) {
@@ -428,6 +444,7 @@ public class dashboard extends gym {
             for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++) {
                 TableColumn column = columnModel.getColumn(columnIndex);
                 column.setResizable(false);
+                dtm.isCellEditable(columnIndex, columnIndex);
             }
 
             // Add the table to a scroll pane
@@ -523,7 +540,9 @@ public class dashboard extends gym {
                     ExpDateField.setText(String.valueOf(member.getExpDate()));
                     usernameField.setText(member.getUsername());
                     passwordField.setText(member.getPassword());
-
+                    
+                    
+                    
                 }
             });
 
@@ -811,6 +830,12 @@ public class dashboard extends gym {
         }
 
     }
+     private void clearTable(DefaultTableModel tableModel ) {
+        // Clear the rows from the DefaultTableModel
+        while (tableModel.getRowCount() > 0) {
+            tableModel.removeRow(0);
+        }
+    }
     public void clear(JTextField[] fields) {
         for (JTextField e: fields) {
             e.setText("");
@@ -826,8 +851,26 @@ public class dashboard extends gym {
         return true;
     }
 
+//    public class WideComboBoxRenderer extends DefaultListCellRenderer {
+//    @Override
+//    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+//        JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+//        label.setPreferredSize(new Dimension(200, label.getPreferredSize().height)); // Set a wider preferred size
+//        return label;
+//    }
+//    }
+    
     class EmployeeLogs extends JPanel {
-        DefaultTableModel dtm = new DefaultTableModel();
+       DefaultTableModel dtm;
+       DefaultTableModel model1;
+       
+       private JTextField nameTextField;
+        private JTextField positionTextField;
+        private JTextField contactTextField;
+        private JTextField hoursTextField;
+        private JTextField overtimeTextField;
+        private JTextField payRateTextField;
+        private JTextField totalTextField;
 
         private void updateTableData() {
             dtm.setRowCount(0); // Clear existing rows
@@ -842,9 +885,26 @@ public class dashboard extends gym {
             }
 
         }
+        
+        
 
         public EmployeeLogs() {
 
+            String[] jobTitles = {
+            "General Manager",
+            "Assistant Manager",
+            "Front Desk Receptionist",
+            "Fitness Trainer/Instructor",
+            "Personal Trainer",
+            "Membership Sales Representative",
+            "Cleaning Staff/Janitor",
+            "Maintenance Technician",
+            "Group Fitness Coordinator",
+            "Nutritionist/Dietitian",
+            "Marketing Manager",
+            "Administrative Assistant"
+            };
+                    
             setBackground(Color.decode("#ebebeb"));
             setLayout(null);
 
@@ -854,7 +914,7 @@ public class dashboard extends gym {
             JLabel contactNoLbl = new JLabel("Contact");
             JTextField idField = new JTextField(10);
             JTextField nameField = new JTextField(10);
-            JTextField positionField = new JTextField(10);
+            JComboBox positionBox = new JComboBox<>(jobTitles);
             JTextField contactNoField = new JTextField(10);
             JButton create = new JButton("Create");
             JButton update = new JButton("Update");
@@ -862,6 +922,12 @@ public class dashboard extends gym {
             JButton clear = new JButton("Clear");
             JLabel error = new JLabel("must not be empty");
 
+            Font font = new Font("Segoe UI", Font.PLAIN, 12);
+            positionBox.setFont(font);
+
+//            positionBox.setRenderer(new WideComboBoxRenderer());
+
+            
             // Create the main panel to hold the table and its header
             JPanel mainPanel = new JPanel();
             mainPanel.setBounds(20, 20, 450, 200);
@@ -870,7 +936,24 @@ public class dashboard extends gym {
             add(mainPanel);
 
             // Create the table model and the table
-
+            
+            dtm = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are non-editable
+                return false;
+            }
+            };
+            
+            model1 = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are non-editable
+                return false;
+            }
+            };
+            
+            
             dtm.addColumn("ID");
             dtm.addColumn("NAME");
             dtm.addColumn("POSITION");
@@ -913,11 +996,53 @@ public class dashboard extends gym {
                     int row = table.rowAtPoint(e.getPoint());
                     int idfromTable = (int) table.getValueAt(row, 0);
                     Employees employee = workers.findEmployeeByID(idfromTable);
+
+                    // Fetch the employee's attendance records
+                    List<Employees.Attendance> attendanceRecords = employee.getAttendanceRecords();
+
+                    // Calculate actual hours worked and overtime hours based on attendance records
+                    int hoursWorked = 0;
+                    int overtimeHours = 0;
+
+                    for (Employees.Attendance record : attendanceRecords) {
+                        if (record.getClockOut() != null) {
+                            // Calculate duration between clock in and clock out
+                            long durationInMinutes = java.time.Duration.between(record.getClockIn(), record.getClockOut()).toMinutes();
+                            // Convert to hours
+                            int hours = (int) (durationInMinutes / 60);
+
+                            // Check if the hours fall within regular hours or overtime
+                             if (hours <= 8) {
+                                hoursWorked += hours;
+                            } else {
+                                hoursWorked += 8; // Regular hours capped at 8
+                                overtimeHours += hours - 8; // Overtime hours start after 8 hours
+                            }
+                        }
+                    }
+
+                    // Set the fields in your UI components
                     idField.setText(String.valueOf(employee.getEmployeeId()));
                     nameField.setText(employee.getName());
-                    positionField.setText(employee.getPosition());
+                    positionBox.setSelectedItem(employee.getPosition());
                     contactNoField.setText(employee.getContactNo());
 
+                    // Format the calculated values
+                    String formattedHoursWorked = String.valueOf(hoursWorked);
+                    String formattedOvertimeHours = String.valueOf(overtimeHours);
+                    String payRate = String.format("%.2f", employee.calculateHourlyPayRate(employee.getPosition()));
+
+                    // Example calculation of total earnings (you should implement your own logic based on your requirements)
+                    double totalEarnings = calculateTotalEarnings(employee);
+                    String formattedTotalEarnings = String.format("%.2f", totalEarnings);
+
+                    // Update UI with the formatted values
+                    setEmployeeFields(employee.getName(), employee.getPosition(), employee.getContactNo(), formattedHoursWorked, formattedOvertimeHours, payRate, formattedTotalEarnings);
+
+                    // Update table data if needed
+                    if (row != -1) {
+                        updateTableData1(workers, idfromTable, model1);
+                    }
                 }
             });
 
@@ -938,7 +1063,7 @@ public class dashboard extends gym {
             nameLbl.setBounds(20, 60, 100, 30);
             nameField.setBounds(80, 60, 100, 30);
             positionLbl.setBounds(20, 100, 100, 30);
-            positionField.setBounds(80, 100, 100, 30);
+            positionBox.setBounds(80, 100, 100, 30);
             contactNoLbl.setBounds(20, 140, 100, 30);
             contactNoField.setBounds(80, 140, 100, 30);
 
@@ -975,7 +1100,7 @@ public class dashboard extends gym {
             infoPanel.add(nameLbl);
             infoPanel.add(nameField);
             infoPanel.add(positionLbl);
-            infoPanel.add(positionField);
+            infoPanel.add(positionBox);
             infoPanel.add(contactNoLbl);
             infoPanel.add(contactNoField);
             infoPanel.add(create);
@@ -990,7 +1115,7 @@ public class dashboard extends gym {
 
                     // use a constructor that allows us to specify a parent and modality
                     JDialog createForm = new JDialog(dh, true);
-                    createForm.setSize(300, 300);
+                    createForm.setSize(400, 300);
                     createForm.setResizable(false);
 
                     // Set layout manager
@@ -1000,13 +1125,29 @@ public class dashboard extends gym {
                     gbc.fill = GridBagConstraints.HORIZONTAL;
                     gbc.insets = new Insets(5, 5, 5, 5);
 
+                    String[] jobTitles = {
+                    "General Manager",
+                    "Assistant Manager",
+                    "Front Desk Receptionist",
+                    "Fitness Trainer/Instructor",
+                    "Personal Trainer",
+                    "Membership Sales Representative",
+                    "Cleaning Staff/Janitor",
+                    "Maintenance Technician",
+                    "Group Fitness Coordinator",
+                    "Nutritionist/Dietitian",
+                    "Marketing Manager",
+                    "Administrative Assistant"
+                    };
+                    
                     // Create labels and text fields
                     JLabel nameLbl = new JLabel("Name");
                     JLabel positionLbl = new JLabel("Position");
                     JLabel contactNoLbl = new JLabel("Contact No.");
 
                     JTextField cnameField = new JTextField(10);
-                    JTextField tpositionField = new JTextField(10);
+//                  JTextField tpositionField = new JTextField(10);
+                    JComboBox jobComboBox = new JComboBox<>(jobTitles);
                     JTextField ccontactField = new JTextField(10);
                     JButton createBtn = new JButton("Create");
                     JLabel error2 = new JLabel("username or password is incorrect.");
@@ -1024,13 +1165,12 @@ public class dashboard extends gym {
                         public void mouseClicked(MouseEvent e) {
                             error2.setVisible(false);
                             cnameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-                            tpositionField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                            jobComboBox.setSelectedIndex(0);
                             ccontactField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                         }
 
                     });
                     cnameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-                    tpositionField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     ccontactField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
 
                     createBtn.setBackground(Color.green);
@@ -1038,23 +1178,25 @@ public class dashboard extends gym {
                         @Override
                         public void mouseClicked(MouseEvent e) {
                             String name = cnameField.getText();
-                            String position = tpositionField.getText();
+                            String position = (String) jobComboBox.getSelectedItem();
                             String contact = ccontactField.getText();
 
                             isnotEmpty(cnameField);
-                            isnotEmpty(tpositionField);
                             isnotEmpty(ccontactField);
 
-                            if (isnotEmpty(cnameField) && isnotEmpty(tpositionField) && isnotEmpty(ccontactField)) {
+                            if (isnotEmpty(cnameField) && !position.isEmpty() && isnotEmpty(ccontactField)) {
 
                                 workers.addEmployee(new Employees(name, position, contact));
                                 JOptionPane.showMessageDialog(cardPanel, "Sucessfully created a member");
                                 updateTableData();
+                                JTextField[] textFields = {nameTextField, positionTextField, contactTextField, hoursTextField, overtimeTextField, payRateTextField, totalTextField};
+                                clear(textFields);
                                 JTextField[] fields = {
                                     cnameField,
-                                    tpositionField,
                                     ccontactField,
                                 };
+                                jobComboBox.setSelectedIndex(0);
+                                clearTable(model1);
                                 clear(fields);
                                 createForm.dispose();
                             } else {
@@ -1081,7 +1223,7 @@ public class dashboard extends gym {
 
                     // Adding positionField at (1, 1)
                     gbc.gridx = 1;
-                    createForm.add(tpositionField, gbc);
+                    createForm.add(jobComboBox, gbc);
 
                     // Adding contactNoLbl at (0, 2)
                     gbc.gridx = 0;
@@ -1101,6 +1243,11 @@ public class dashboard extends gym {
                     createForm.add(error2, gbc); //2,2
                     // Center the frame
 
+                    
+                    
+                    
+                    
+                    
                     createForm.setLocationRelativeTo(null);
                     createForm.setVisible(true);
                 }
@@ -1110,15 +1257,14 @@ public class dashboard extends gym {
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     String name = nameField.getText();
-                    String position = positionField.getText();
+                    String position = positionBox.getSelectedItem().toString();
                     String contactNo = contactNoField.getText();
 
                     isnotEmpty(idField);
                     isnotEmpty(nameField);
-                    isnotEmpty(positionField);
                     isnotEmpty(contactNoField);
 
-                    if (isnotEmpty(nameField) && isnotEmpty(positionField) && isnotEmpty(contactNoField)) {
+                    if (isnotEmpty(nameField) && !position.isEmpty() && isnotEmpty(contactNoField)) {
                         Employees e = workers.findEmployeeByID(Integer.parseInt(idField.getText()));
 
                         e.setName(name);
@@ -1126,13 +1272,16 @@ public class dashboard extends gym {
                         e.setContactNo(contactNo);
 
                         JOptionPane.showMessageDialog(cardPanel, "Sucessfully updated a member");
+                        JTextField[] textFields = {nameTextField, positionTextField, contactTextField, hoursTextField, overtimeTextField, payRateTextField, totalTextField};
+                        clear(textFields);
+                        positionBox.setSelectedItem(0);
                         JTextField[] fields = {
-
+                            idField,
                             nameField,
-                            positionField,
                             contactNoField
 
                         };
+                        clearTable(model1);
                         clear(fields);
                         updateTableData();
 
@@ -1157,10 +1306,14 @@ public class dashboard extends gym {
                         }
                         }
                         JTextField[] fields = {
+                            idField,
                             nameField,
-                            positionField,
                             contactNoField,
                         };
+                        positionBox.setSelectedItem(0);
+                        clearTable(model1);
+                        JTextField[] textFields = {nameTextField, positionTextField, contactTextField, hoursTextField, overtimeTextField, payRateTextField, totalTextField};
+                        clear(textFields);
                         clear(fields);
                     } else {
                         error.setText("please select from table");
@@ -1176,13 +1329,16 @@ public class dashboard extends gym {
                     JTextField[] fields = {
                         idField,
                         nameField,
-                        positionField,
                         contactNoField,
                     };
+                    positionBox.setSelectedItem(0);
+                    JTextField[] textFields = {nameTextField, positionTextField, contactTextField, hoursTextField, overtimeTextField, payRateTextField, totalTextField};
+                    clear(textFields);
                     clear(fields);
+                    clearTable(model1);
                     error.setVisible(false);
                     nameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-                    positionField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                    positionBox.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     contactNoField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     idField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                 }
@@ -1192,17 +1348,242 @@ public class dashboard extends gym {
                 public void mouseClicked(MouseEvent e) {
                     error.setVisible(false);
                     nameField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
-                    positionField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+                    positionBox.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     contactNoField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                     idField.setBorder(BorderFactory.createLineBorder(Color.black, 1));
                 }
 
             });
+            
+            JPanel attendancePanel = new JPanel();
+            attendancePanel.setBounds(370,240,400,230);
+            attendancePanel.setBackground(Color.WHITE);
+            attendancePanel.setLayout(new BorderLayout());
+            
+            
+            model1.addColumn("CLOCK-IN");
+            model1.addColumn("CLOCK-OUT");
+            model1.addColumn("SHIFT");
+            model1.addColumn("DATE");
 
+            // Example data
+
+            JTable table2 = new JTable(model1);
+
+            // Set the default cell renderer with padding
+            table2.setDefaultRenderer(Object.class, cellRenderer);
+
+            // Customize the table header
+            JTableHeader header2 = table2.getTableHeader();
+            header2.setReorderingAllowed(false); // Disable column dragging
+            Font headerFont2 = new Font("Segoe UI", Font.BOLD, 16);
+            Color headerFontColor2 = Color.WHITE;
+            header2.setFont(headerFont2);
+            header2.setForeground(headerFontColor2);
+            header2.setBackground(Color.decode("#366f9a"));
+
+            // Disable column resizing
+            TableColumnModel columnMode2 = header2.getColumnModel();
+            for (int columnIndex = 0; columnIndex < columnMode2.getColumnCount(); columnIndex++) {
+                TableColumn column = columnMode2.getColumn(columnIndex);
+                column.setResizable(false);
+            }
+
+            // Add the table to a scroll pane
+            JScrollPane scrollPane1 = new JScrollPane(table2);
+            attendancePanel.add(scrollPane1, BorderLayout.CENTER);
+
+            // set info
+            
+            JPanel payrollPanel = new JPanel(new GridBagLayout());
+            payrollPanel.setBackground(Color.WHITE);
+            TitledBorder titled = BorderFactory.createTitledBorder("Payroll Panel");
+            titled.setTitlePosition(TitledBorder.TOP);
+            titled.setTitleJustification(TitledBorder.CENTER);
+            payrollPanel.setBorder(titled);
+            payrollPanel.setBounds(20, 240, 330, 230);
+            
+            
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(5, 5, 5, 5); // Padding
+            gbc.fill = GridBagConstraints.HORIZONTAL; // Fill horizontally
+            
+            // Labels
+            JLabel nameLabel = new JLabel("Name:");
+            JLabel positionLabel = new JLabel("Position:");
+            JLabel contactLabel = new JLabel("Contact No:");
+            JLabel hoursLabel = new JLabel("Hours Worked:");
+            JLabel overtimeLabel = new JLabel("Overtime Hours:");
+            JLabel payRateLabel = new JLabel("Pay Rate:");
+            JLabel totalLabel = new JLabel("Total:");
+        
+            // Text Fields
+            nameTextField = new JTextField("", 15);
+            positionTextField = new JTextField("", 15);
+            contactTextField = new JTextField("", 15);
+            hoursTextField = new JTextField("", 5);
+            overtimeTextField = new JTextField("", 5);
+            payRateTextField = new JTextField("", 10);
+            totalTextField = new JTextField("", 10);
+
+            nameTextField.setEditable(false);
+            positionTextField.setEditable(false);
+            contactTextField.setEditable(false);
+            hoursTextField.setEditable(false);
+            overtimeTextField.setEditable(false);
+            payRateTextField.setEditable(false);
+            totalTextField.setEditable(false);
+            
+            JTextField[] textFields = {nameTextField, positionTextField, contactTextField, hoursTextField, overtimeTextField, payRateTextField, totalTextField};
+
+            for (JTextField textField : textFields) {
+                textField.setEditable(false);
+                textField.setFocusable(false);
+                Dimension textFieldSize = new Dimension(150, 20);
+                textField.setPreferredSize(textFieldSize);
+                textField.setMinimumSize(textFieldSize);
+                textField.setMaximumSize(textFieldSize);
+            }
+
+            // Adding components to the main panel
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            payrollPanel.add(nameLabel, gbc);
+            gbc.gridx = 1;
+            payrollPanel.add(nameTextField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            payrollPanel.add(positionLabel, gbc);
+            gbc.gridx = 1;
+            payrollPanel.add(positionTextField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            payrollPanel.add(contactLabel, gbc);
+            gbc.gridx = 1;
+            payrollPanel.add(contactTextField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            payrollPanel.add(hoursLabel, gbc);
+            gbc.gridx = 1;
+            payrollPanel.add(hoursTextField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            payrollPanel.add(overtimeLabel, gbc);
+            gbc.gridx = 1;
+            payrollPanel.add(overtimeTextField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 5;
+            payrollPanel.add(payRateLabel, gbc);
+            gbc.gridx = 1;
+            payrollPanel.add(payRateTextField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 6;
+            payrollPanel.add(totalLabel, gbc);
+            gbc.gridx = 1;
+            payrollPanel.add(totalTextField, gbc);
+
+                  
+            add(payrollPanel);
+            setVisible(true);
+            add(attendancePanel);
             add(infoPanel);
+            
+            
+        }
+        private void updateTableData1(Employees workers, int employeeID,DefaultTableModel model) {
+            model.setRowCount(0); // Clear existing rows
+
+            Employees worker = workers.findEmployeeByID(employeeID);
+            if (worker != null) {
+                // Get the employee's attendance records
+                List<Employees.Attendance> attendanceRecords = worker.getAttendanceRecords();
+
+                // Add attendance records to the table model
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("h:mm a");
+                DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("MMMM dd");
+                for (Employees.Attendance record : attendanceRecords) {
+                    String clockOutStr = (record.getClockOut() != null) ? record.getClockOut().format(formatter) : "N/A";
+                    String day = record.getClockIn().format(dayFormatter);
+                    model.addRow(new Object[]{
+                        record.getClockIn().format(formatter),
+                        clockOutStr,
+                        record.getShift(),
+                        day
+                    });
+                }
+            } else {
+                System.out.println("Employee with ID " + employeeID + " not found.");
+            }
 
         }
+        private void setEmployeeFields(String name, String position, String contactNo, String hoursWorked, String overtimeHours, String payRate, String total) {
+            nameTextField.setText(name);
+            positionTextField.setText(position);
+            contactTextField.setText(contactNo);
+            hoursTextField.setText(hoursWorked);
+            overtimeTextField.setText(overtimeHours);
+            payRateTextField.setText("$ " + payRate + " / hr");
+            totalTextField.setText("$ " + total);
+        }
+        
+    private double calculateTotalEarnings(Employees employee) {
+        // Initialize hours worked and overtime hours to 0
+        int hoursWorked = 0;
+        int overtimeHours = 0;
+
+        // Retrieve the employee's attendance records
+        List<Employees.Attendance> attendanceRecords = employee.getAttendanceRecords();
+
+        // Loop through attendance records
+            for (Employees.Attendance record : attendanceRecords) {
+                    if (record.getClockOut() != null) {
+                         // Calculate duration between clock in and clock out
+                    long durationInMinutes = java.time.Duration.between(record.getClockIn(), record.getClockOut()).toMinutes();
+
+                    // Convert to hours
+                    int hours = (int) (durationInMinutes / 60);
+
+                    // Check if the hours fall within regular hours or overtime
+                    if (hours <= 8) {
+                        hoursWorked += hours;
+                    } else {
+                        hoursWorked += 8;
+                        overtimeHours += hours - 8;
+                    }
+                        
+                }
+            }
+
+            // Get the employee's hourly pay rate
+            double payRate = employee.calculateHourlyPayRate(employee.getPosition());
+
+            // Calculate regular pay and overtime pay
+            double regularPay = hoursWorked * payRate;
+            double overtimePay = overtimeHours * 1.5 * payRate; // Assuming overtime rate is 1.5 times regular rate
+
+            // Calculate total earnings
+            double totalEarnings = regularPay + overtimePay;
+
+
+            // Return total earnings if this is part of a method
+return totalEarnings;
     }
+
+
+        
+    }
+    
+    
+    
+         
+         
+
 
     class EquipmentsPanel extends JPanel {
         public EquipmentsPanel() {
