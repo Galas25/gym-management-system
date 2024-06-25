@@ -924,7 +924,7 @@ public class dashboard extends gym {
                 public void actionPerformed(ActionEvent e) {
                     String name = nameField.getText();
                     String start = String.valueOf(startDateField.getText());
-                    String exp = String.valueOf(expDate.getText());
+                    String exp = String.valueOf(expDateField.getText());
                     String username = usernameField.getText();
                     String password = passwordField.getText();
                     String membership = membershipType.getSelectedItem().toString();

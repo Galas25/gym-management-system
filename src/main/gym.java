@@ -46,7 +46,8 @@ public class gym {
             emp1.displayAttendanceRecords();
         }
     
-    new dashboard(username);
+//    new dashboard(username);
+    signUp();
     
   }
   
@@ -219,61 +220,7 @@ public class gym {
     frame.toFront();
   }
   public static void signUp() {
-    JFrame frame = new JFrame();
-    frame.setTitle("Sign Up");
-    frame.setLocationRelativeTo(null);
-    frame.setLayout(null);
-    JLabel label = new JLabel("Register as a Member");
-    label.setHorizontalTextPosition(JLabel.CENTER);
-    label.setVerticalTextPosition(JLabel.TOP);
-    label.setBounds(160, -20 , 200, 100);
-    label.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-    frame.add(label);
-    
-    JButton register = new JButton("Register");
-
-    JPasswordField password = new JPasswordField();
-
-    JLabel user = new JLabel("Username");
-
-    JLabel user_password = new JLabel("Password");
-
-    JTextField username = new JTextField();
-
-    //  user's username
-    user.setBounds(150, 60, 200, 40);
-    username.setBounds(150, 100, 200, 40);
-
-    //user's password
-    user_password.setBounds(150, 150, 200, 40);
-    password.setBounds(150, 200, 200, 40);
-
-    register.setBounds(150, 250, 200, 40);
-
-    register.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        frame.dispose();
-        login();
-      }
-    });
-    // Add WindowListener to trigger function on close
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                login();
-            }
-        });
-    frame.add(register);
-    frame.add(user);
-    frame.add(username);
-    frame.add(user_password);
-    frame.add(password);
-    frame.setBounds(450, 180, 500, 540);
-    frame.setLocationRelativeTo(null);
-    frame.toFront();
-    frame.setVisible(true);
-
+    new Register();
   }
   
    
