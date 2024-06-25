@@ -34,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -444,7 +445,7 @@ public class dashboard extends gym {
             for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++) {
                 TableColumn column = columnModel.getColumn(columnIndex);
                 column.setResizable(false);
-                dtm.isCellEditable(columnIndex, columnIndex);
+
             }
 
             // Add the table to a scroll pane
@@ -1579,30 +1580,219 @@ return totalEarnings;
         
     }
     
-    
-    
-         
-         
 
 
     class EquipmentsPanel extends JPanel {
+        
+        private JTable table;
+        private DefaultTableModel tableModel;
+        private JTextField nameField;
+        private JTextField quantityField;
+//        private JTextField statusField;
+        JComboBox<String> statusComboBox;
+        private JTextArea remarksField;
+        private int selectedRow = -1;
         public EquipmentsPanel() {
-            setBackground(Color.decode("#ebebeb"));
-            add(new JLabel("Equipments Content"));
-            JPanel p1 = new JPanel();
-            setLayout(null);
-            p1.setBounds(20, 20, 745, 200);
-            p1.setBackground(Color.WHITE);
-            JPanel p1_2 = new JPanel();
-            p1_2.setBackground(Color.decode("#4daddc"));
-            int thickness = 5; // Adjust the thickness as desired
-            p1_2.setBorder(BorderFactory.createEmptyBorder(thickness, 0, thickness, 0));
+            
+            String[] statusOptions = {
+                "Operational",
+                "Under Maintenance",
+                "Out of Order",
+                "Reserved",
+                "Available",
+                "In Use",
+                "Needs Repair",
+                "Cleaning in Progress",
+                "Lost",
+                "Pending",
+                "Out for Delivery",
+                "Disposed",
+                "Not in Stock",
+                "On Hold",
+                "Inactive",
+                "Needs Maintenance",
+                "Missing"
+            };
+            
+ 
+            tableModel = new DefaultTableModel(new Object[]{"Equipment", "Quantity", "Status", "Remarks"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // All cells are non-editable
+                return false;
+            }
+            };
+  
+            table = new JTable(tableModel);
+            table.setRowHeight(25);
+            table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+            table.setFont(new Font("Arial", Font.PLAIN, 14));
+            table.setSelectionBackground(new Color(184, 207, 229));
+            table.setSelectionForeground(Color.BLACK);
 
-            p1.setLayout(new BorderLayout());
+            JTableHeader header = table.getTableHeader();
+            header.setReorderingAllowed(false); // Disable column dragging
+            Font headerFont = new Font("Segoe UI", Font.BOLD, 16);
+            Color headerFontColor = Color.WHITE;
+            header.setFont(headerFont);
+            header.setForeground(headerFontColor);
+            header.setBackground(Color.decode("#366f9a"));
 
-            p1.add(p1_2, BorderLayout.NORTH);
-            add(p1);
-        }
+            JScrollPane scrollPane = new JScrollPane(table);
+            add(scrollPane, BorderLayout.CENTER);
+            
+            TableColumnModel columnModel = header.getColumnModel();
+            for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++) {
+                TableColumn column = columnModel.getColumn(columnIndex);
+                column.setResizable(false);
+            }
+            tableModel.addRow(new Object[]{"Treadmill", "5", "Operational", "Recently Bought"});
+            tableModel.addRow(new Object[]{"Barbell Set", "3", "Needs Maintenance", "Slightly Damaged"});
+            tableModel.addRow(new Object[]{"Stationary Bike", "3", "Operational", "Needs Maintenance"});
+            tableModel.addRow(new Object[]{"Dumbbell Rack", "4", "Missing", "Two Dumbbells are missing"});
+            tableModel.addRow(new Object[]{"Elliptical Trainer", "5", "Available", "Good Condition"});
+            
+            JPanel inputPanel = new JPanel(new GridBagLayout());
+            inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(5, 5, 5, 5);
+            gbc.fill = GridBagConstraints.HORIZONTAL;
 
-    }
+
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            inputPanel.add(new JLabel("Equipment Name:"), gbc);
+            nameField = new JTextField(10);
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+            inputPanel.add(nameField, gbc);
+
+
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            inputPanel.add(new JLabel("Quantity:"), gbc);
+            quantityField = new JTextField(10);
+            gbc.gridx = 1;
+            gbc.gridy = 1;
+            inputPanel.add(quantityField, gbc);
+
+
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            inputPanel.add(new JLabel("Status:"), gbc);
+            statusComboBox = new JComboBox<>(statusOptions);
+            gbc.gridx = 1;
+            gbc.gridy = 2;
+            inputPanel.add(statusComboBox, gbc);
+
+
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            inputPanel.add(new JLabel("Remarks:"), gbc);
+            remarksField = new JTextArea();
+            gbc.gridx = 1;
+            gbc.gridy = 3;
+            inputPanel.add(remarksField, gbc);
+
+
+            JPanel buttonsPanel = new JPanel();
+            JButton addButton = new JButton("Add/Update");
+            addButton.setBackground(new Color(34, 139, 34));
+            addButton.setForeground(Color.WHITE);
+            addButton.setFont(new Font("Arial", Font.BOLD, 12));
+            remarksField.setBorder(new LineBorder(Color.BLACK)); 
+            nameField.setBorder(new LineBorder(Color.BLACK)); 
+            quantityField.setBorder(new LineBorder(Color.BLACK)); 
+            Dimension preferredSize = new Dimension(100, 100);
+            remarksField.setPreferredSize(preferredSize);
+            remarksField.setLineWrap(true); // Enable line wrapping
+            remarksField.setWrapStyleWord(true); // Wrap at word boundaries
+
+            addButton.setFocusPainted(false);
+            addButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    addOrUpdateEquipment();
+                }
+            });
+
+            JButton deleteButton = new JButton("Delete");
+            deleteButton.setBackground(new Color(220, 20, 60));
+            deleteButton.setForeground(Color.WHITE);
+            deleteButton.setFont(new Font("Arial", Font.BOLD, 12));
+            deleteButton.setFocusPainted(false);
+            deleteButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    deleteEquipment();
+                }
+            });
+
+            buttonsPanel.add(addButton);
+            buttonsPanel.add(deleteButton);
+
+
+            add(inputPanel, BorderLayout.NORTH);
+            add(buttonsPanel, BorderLayout.SOUTH);
+            
+
+
+                table.getSelectionModel().addListSelectionListener(e -> {
+                    if (!e.getValueIsAdjusting()) {
+                        selectedRow = table.getSelectedRow();
+                        if (selectedRow != -1) {
+                            nameField.setText(tableModel.getValueAt(selectedRow, 0).toString());
+                            quantityField.setText(tableModel.getValueAt(selectedRow, 1).toString());
+                            statusComboBox.setSelectedItem(tableModel.getValueAt(selectedRow, 2).toString());
+                            remarksField.setText(tableModel.getValueAt(selectedRow, 3).toString());
+                        }
+                    }
+                });
+            }
+
+            private void addOrUpdateEquipment() {
+                String name = nameField.getText();
+                String quantity = quantityField.getText();
+                String status = statusComboBox.getSelectedItem().toString();
+                String remarks = remarksField.getText();
+
+                if (name.isEmpty() || quantity.isEmpty() || status.isEmpty() || remarks.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "All fields must be filled out", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (selectedRow == -1) {
+                    tableModel.addRow(new Object[]{name, quantity, status, remarks});
+                } else {
+                    tableModel.setValueAt(name, selectedRow, 0);
+                    tableModel.setValueAt(quantity, selectedRow, 1);
+                    tableModel.setValueAt(status, selectedRow, 2);
+                    tableModel.setValueAt(remarks, selectedRow, 3);
+                    selectedRow = -1;
+                }
+
+                clearFields();
+                setVisible(true);
+            }
+
+            private void deleteEquipment() {
+                if (selectedRow != -1) {
+                    tableModel.removeRow(selectedRow);
+                    selectedRow = -1;
+                    clearFields();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Please select a row to delete", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            private void clearFields() {
+                nameField.setText("");
+                quantityField.setText("");
+                statusComboBox.setSelectedIndex(0);
+                remarksField.setText("");
+            }
+            
+           
+            }
+
 }
