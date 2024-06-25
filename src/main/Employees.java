@@ -1,62 +1,104 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package main;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-    
 public class Employees {
     private Employees[] employee;
-    int employeeCount;
     int employeeId;
+    int employeeCount;
     String name;
     String position;
     String contactNo;
-    
-    public Employees(int size){
+    List<Attendance> attendanceRecords;
+    private double hourlyPayRate; // Added field for hourly pay rate
+
+    public Employees(int size) {
         employee = new Employees[size];
-        employeeCount = 0; 
+        employeeCount = 0;
+        attendanceRecords = new ArrayList<>();
     }
-    public int emId(){
-        
-        int tempId = counter.getEmployeeCount() + 1;
-        counter.setEmployeeCount(counter.employeeCount + 1);
+
+    public int memId(){
+        int tempId = 0;
+        tempId += counter.getEmployeeCount() + 1;
+        counter.setEmployeeCount(tempId);
         return tempId;
+        
     }
-    public Employees(String name, String position, String contactNo){
-        this.employeeId = emId();
+
+    public Employees(String name, String position, String contactNo) {
+        this.employeeId = memId();
         this.name = name;
         this.contactNo = contactNo;
         this.position = position;
-  
+        this.hourlyPayRate = calculateHourlyPayRate(position); // Set hourly pay rate based on position
+        this.attendanceRecords = new ArrayList<>();
     }
-    class Attendance{
-        LocalDate clockIn;
-        LocalDate clockOut;
-        String shift;
+    
         
-        public Attendance(LocalDate in, LocalDate out, String shift){
+    
+    
+    public double calculateHourlyPayRate(String position) {
+    switch (position) {
+        case "General Manager":
+            return (60000 + 80000) / 2080.0; // Average of the salary range divided by hours worked per year
+        case "Assistant Manager":
+            return (40000 + 55000) / 2080.0;
+        case "Front Desk Receptionist":
+            return (25000 + 35000) / 2080.0;
+        case "Fitness Trainer/Instructor":
+            return (30000 + 50000) / 2080.0;
+        case "Personal Trainer":
+            return (40000 + 60000) / 2080.0;
+        case "Membership Sales Representative":
+            return (30000 + 45000) / 2080.0;
+        case "Cleaning Staff/Janitor":
+            return (20000 + 30000) / 2080.0;
+        case "Maintenance Technician":
+            return (35000 + 50000) / 2080.0;
+        case "Group Fitness Coordinator":
+            return (35000 + 50000) / 2080.0;
+        case "Nutritionist/Dietitian":
+            return (45000 + 65000) / 2080.0;
+        case "Marketing Manager":
+            return (50000 + 70000) / 2080.0;
+        case "Administrative Assistant":
+            return (30000 + 40000) / 2080.0;
+        default:
+            return 0.0; // Return 0.0 if position not found or if hourly rate cannot be determined
+    }
+}
+
+
+
+    public class Attendance {
+        LocalDateTime clockIn;
+        LocalDateTime clockOut;
+        String shift;
+
+        public Attendance(LocalDateTime in, LocalDateTime out, String shift) {
             this.clockIn = in;
             this.clockOut = out;
             this.shift = shift;
         }
 
-        public LocalDate getClockIn() {
+        public LocalDateTime getClockIn() {
             return clockIn;
         }
 
-        public void setClockIn(LocalDate clockIn) {
+        public void setClockIn(LocalDateTime clockIn) {
             this.clockIn = clockIn;
         }
 
-        public LocalDate getClockOut() {
+        public LocalDateTime getClockOut() {
             return clockOut;
         }
 
-        public void setClockOut(LocalDate clockOut) {
+        public void setClockOut(LocalDateTime clockOut) {
             this.clockOut = clockOut;
         }
 
@@ -67,30 +109,41 @@ public class Employees {
         public void setShift(String shift) {
             this.shift = shift;
         }
-        
-    }
-    
-    //attendance
 
-    class Payroll{
+        @Override
+        public String toString() {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            return "Clock In: " + clockIn.format(formatter) +
+                   ", Clock Out: " + (clockOut != null ? clockOut.format(formatter) : "N/A") +
+                   ", Shift: " + shift;
+        }
+    }
+
+    public class Payroll {
         int hrWorked;
         int overtime;
         int payrate;
         Random random = new Random();
-        
-        public Payroll(){
-            this.hrWorked = random.nextInt(12) + 1;;
-            this.overtime = random.nextInt(3) + 1;
-            this.payrate = 500;
+
+        public Payroll() {
+            this.hrWorked = random.nextInt(40) + 1;
+            this.overtime = random.nextInt(5) + 1;
+            this.payrate = 16;
         }
-        
-        public Payroll(int hour, int overtime, int pay){
+
+        public Payroll(int hour, int overtime, int pay) {
             this.hrWorked = hour;
             this.overtime = overtime;
             this.payrate = pay;
-
         }
+        
+        public double calculateEarnings() {
+        double regularPay = hrWorked * payrate;
+        double overtimePay = overtime * 1.5 * payrate; // Assuming overtime rate is 1.5 times regular rate
 
+        return regularPay + overtimePay;
+        }
+        
         public int getHrWorked() {
             return hrWorked;
         }
@@ -114,107 +167,109 @@ public class Employees {
         public void setPayrate(int payrate) {
             this.payrate = payrate;
         }
+    }
 
-        public Random getRandom() {
-            return random;
+    public void addAttendanceRecord(LocalDateTime clockIn, LocalDateTime clockOut, String shift) {
+        attendanceRecords.add(new Attendance(clockIn, clockOut, shift));
+    }
+
+    public List<Attendance> getAttendanceRecords() {
+        return attendanceRecords;
+    }
+
+    public void displayAttendanceRecords() {
+        System.out.println("Attendance Records for Employee: " + name);
+        for (Attendance record : attendanceRecords) {
+            System.out.println(record);
         }
-
-        public void setRandom(Random random) {
-            this.random = random;
-        }
-        
     }
 
-    public int getEmployeeId() {
-        return employeeId;
-    }
-    public void setEmployeeId(int employeeId) {
-        this.employeeId = employeeId;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getPosition() {
-        return position;
-    }
-    public void setPosition(String position) {
-        this.position = position;
-    }
-    public String getContactNo() {
-        return contactNo;
-    }
-    public void setContactNo(String contactNo) {
-        this.contactNo = contactNo;
-    }
-           
-     private void resizeEmployeeArray() {
-        int newSize = employee.length * 2; // Double the size of the current array
+    // Existing methods for employee management
+
+    private void resizeEmployeeArray() {
+        int newSize = employee.length * 2;
         Employees[] newArray = new Employees[newSize];
-        // Copy existing members to the new array
         System.arraycopy(employee, 0, newArray, 0, employee.length);
         employee = newArray;
-    }  
-    
-    public void addEmployee(Employees employees){
-        if (employeeCount >= employee.length){
+    }
+
+    public void addEmployee(Employees employees) {
+        if (employeeCount >= employee.length) {
             resizeEmployeeArray();
         }
 
         employee[employeeCount] = employees;
         employeeCount++;
     }
-    
-    public void removeEmployee(int id) {
-    int index = -1;
-    
-    // Find the index of the member with the given ID
-    for (int i = 0; i < employeeCount; i++) {
-        if (employee[i].getEmployeeId() == id) {
-            index = i;
-            break;
-        }
-    }
-    
-    if (index != -1) { // Member found
-        // Shift elements to the left to fill the gap
-        for (int i = index; i < employeeCount - 1; i++) {
-            employee[i] = employee[i + 1];
-        }
-        
-        // Nullify the last element (optional)
-        employee[employeeCount - 1] = null;
-        
-        // Decrement the count of members
-        employeeCount--;
-        
-        System.out.println("Employee with ID " + id + " has been removed.");
-    } else {
-        System.out.println("Employee not found.");
-    }
-}
 
-   public Employees findEmployeeByID(int EmployeeID) {
+    public void removeEmployee(int id) {
+        int index = -1;
+
         for (int i = 0; i < employeeCount; i++) {
-            if (employee[i].getEmployeeId() == EmployeeID) {
-                return employee[i];
+            if (employee[i].getEmployeeId() == id) {
+                index = i;
+                break;
             }
         }
-        return null;
-    }
- 
-        public Employees[] getEmployee() {
-            return employee;
-        }
 
-        public void setEmployee(Employees[] employee) {
-            this.employee = employee;
+        if (index != -1) {
+            for (int i = index; i < employeeCount - 1; i++) {
+                employee[i] = employee[i + 1];
+            }
+            employee[employeeCount - 1] = null;
+            employeeCount--;
+            System.out.println("Employee with ID " + id + " has been removed.");
+        } else {
+            System.out.println("Employee not found.");
         }
-        
-        
-        
     }
 
-    
+    public Employees findEmployeeByID(int EmployeeID) {
+    for (int i = 0; i < employeeCount; i++) {
+        if (employee[i] != null && employee[i].getEmployeeId() == EmployeeID) {
+            return employee[i];
+        }
+    }
+    return null;
+}
+
+    public int getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(int employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public String getContactNo() {
+        return contactNo;
+    }
+
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
+    }
+
+    public Employees[] getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employees[] employee) {
+        this.employee = employee;
+    }
+}

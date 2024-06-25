@@ -29,10 +29,24 @@ public class gym {
     gym.checkInMember(1, LocalDateTime.now());
     gym.checkInMember(2, LocalDateTime.now());
     
-    workers.addEmployee(new Employees("Kulash Mithril","Trainer","0932-328-232"));
-    workers.addEmployee(new Employees("Kulash Mithril","Trainer","0932-328-232"));
+    workers.addEmployee(new Employees("Kulash Mithril","General Manager","0932-328-232"));
+    workers.addEmployee(new Employees("Smithrianite Jade","Assistant Manager","0932-328-232"));
     
-    login();
+    Employees emp1 = workers.findEmployeeByID(1);
+    Employees emp2 = workers.findEmployeeByID(2);
+        if (emp1 != null || emp2 != null) {
+            emp1.addAttendanceRecord(LocalDateTime.of(2024, 6, 24, 8, 0), LocalDateTime.of(2024, 6, 24, 18, 0), "Morning");
+            emp1.addAttendanceRecord(LocalDateTime.of(2024, 6, 25, 8, 0), LocalDateTime.of(2024, 6, 25, 19, 0), "Morning");
+            emp2.addAttendanceRecord(LocalDateTime.of(2024, 6, 24, 16, 0), LocalDateTime.of(2024, 6, 25, 2, 0), "Evening");
+            emp2.addAttendanceRecord(LocalDateTime.of(2024, 6, 25, 16, 0), LocalDateTime.of(2024, 6, 26, 1, 0), "Evening");
+        }
+
+        // Display attendance records for the first employee
+        if (emp1 != null || emp2 != null) {
+            emp1.displayAttendanceRecords();
+        }
+    
+    new dashboard(username);
     
   }
   
@@ -190,7 +204,7 @@ public class gym {
             if(userInput.equals(username) && passwordInput.equals(password)){
                 JOptionPane.showMessageDialog(frame, "Login Successfully");
                 frame.dispose();
-                new dashboard();
+                new dashboard(username);
             }
       
       }
