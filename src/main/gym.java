@@ -47,7 +47,7 @@ public class gym {
         }
     
 //    new dashboard(username);
-    signUp();
+    login();
     
   }
   
@@ -121,7 +121,7 @@ public class gym {
                         if (member.getUsername().equals(Username) && member.getPassword().equals(Password)) {
                         found = true;
                         frame.dispose();
-                        new userPage(member.getMembershipId()); 
+                        new userPage(member.getUsername()); 
                         break;
                         }
                     }

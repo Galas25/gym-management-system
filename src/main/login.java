@@ -92,7 +92,7 @@ public class login extends gym{
                         if (member.getUsername().equals(Username) && member.getPassword().equals(Password)) {
                         found = true;
                         frame.dispose();
-                        new userPage(member.getMembershipId()); 
+                        new userPage(member.getUsername()); 
                         break;
                         }
                     }
